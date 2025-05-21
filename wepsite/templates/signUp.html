@@ -1,0 +1,63 @@
+{% extends "base.html"%}
+{% block title%} Sign Up {% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 position-relative text-center">
+
+    <div class="header mb-4">
+        <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/roof1.png') }}" alt="House" class="img-fluid" style="max-width: 400px;">
+        <h3 class="text-center mt-3">Create an Account</h3>
+    </div>
+
+    <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/orangecat.png') }}" class="cat cat-left" alt="Orange Cat">
+    <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/greycat.png') }}" class="cat cat-right" alt="Gray Cat">
+
+    <div class="wall-background"></div>
+
+    <form method="POST" class="login-form mx-auto">
+        <div class="mb-3 form-group "> 
+            <label for="email"> Email address</label>
+            <input type="email" 
+            class="form-control" 
+            id="email" 
+            name="email" 
+            placeholder="Enter email"> 
+            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+    
+        <div class="mb-3 form-group">
+            <label for="firstName"> First Name</label>
+            <input type="text" 
+            class="form-control" 
+            id="firstName" 
+            name="firstName"
+            placeholder="Enter first name"> 
+        </div>
+    
+        <div class="mb-3 form-group">
+            <label for="password1"> Enter password</label>
+            <input type="password" 
+            class="form-control" 
+            id="password1" 
+            name="password1"
+            placeholder="Enter password"> 
+        </div>
+        <div class="mb-3 form-group">
+            <label for="password2"> Password Confirmation </label>
+            <input type="password" 
+            class="form-control" 
+            id="password2" 
+            name="password2"
+            placeholder="Confirm password"> 
+        </div>
+        <div class="btn-div mb-3 d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+            <button type="submit" class="btn btn-primaty">Login</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

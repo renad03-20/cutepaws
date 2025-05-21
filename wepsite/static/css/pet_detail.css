@@ -1,0 +1,50 @@
+
+h1{
+    color: #fe7113;
+    font-size: 2em;
+    text-align: center;
+}
+p{
+    margin-top: 20px;
+    font-size: 1.2em;
+}
+strong{
+    color: #fe7113;
+    font-size: 1.5em;
+    margin-right: 10px;
+}
+.col-md-6 .btn{
+    margin-top: 20px;
+    height: 50px;
+    width: 200px;
+    border-radius: 35px;
+}
+.col-md-6 .btn:hover{
+    background-color: #fe7113;
+    color: #ffffff;
+    border-color: #fe7113;
+}
+.col-md-6 .img-fluid{
+    width: 100%;
+    height: auto;
+    border-radius: 30px;
+    margin-bottom: 20px;
+}
+.modal{
+    background-color: #000000;
+    color: #fe7113;
+}
+.modal-content{
+    background-color: #383737;
+}
+
+.modal-footer .btn:hover{
+    background-color: #fe7113;
+    color: #ffffff;
+    border-color: #fe7113;
+}
+.form-check-input:hover{
+    background-color: #fe7113;
+    color: #ffffff;
+    border-color: #fe7113;
+}

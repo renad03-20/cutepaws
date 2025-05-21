@@ -1,0 +1,23 @@
+{% extends "pase.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Edit {{ pet.name }}</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <!-- Reuse fields from add_pet.html -->
+    <div class="mb-3">
+      <label class="form-label">Name</label>
+      <input type="text" class="form-control" name="name" value="{{ pet.name }}" required>
+    </div>
+    <!-- Add other fields (age, breed, city, description) similarly -->
+    
+    <div class="mb-3">
+      <label class="form-label">Update Image (Optional)</label>
+      <input type="file" class="form-control" name="image">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </form>
+</div>
+{% endblock %}
+    

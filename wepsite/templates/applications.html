@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Your Applications{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Your Adoption Applications</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Pet</th>
+                <th>Status</th>
+                <th>Messages</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+                <tr>
+                    <td>{{ app.pet.name }}</td>
+                    <td>{{ app.status }}</td>
+                    <td>
+                        <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn btn-primary btn-sm">
+                            View Messages
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

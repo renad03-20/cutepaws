@@ -1,0 +1,59 @@
+.mb-4{
+    color: #fe7113;
+    font-size: 24px;
+}
+.mb-3{
+    font-size: 20px;
+    width: 400px;
+}
+.house-right{
+    width: 500px;
+    position: absolute;
+    top: 200px;
+    z-index: 2;
+    right: 10%;
+}
+.form-control{
+    background-color: transparent;
+    border: 1px solid #fe7113;
+    color: #fe7113;
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    width: 400px;
+    height: 40px;
+    transition: border-color 0.3s;
+}
+.form-control:hover{
+    border-color: #fe7113;
+    box-shadow: 0 0 5px rgba(254, 113, 19, 0.5);
+    background-color: rgb(46, 46, 46);
+    color: #ffffff;
+}
+.form-control:focus{
+    border-color: #fe7113;
+    box-shadow: 0 0 5px rgba(254, 113, 19, 0.5);
+    background-color: rgb(46, 46, 46);
+    color: #ffffff;
+}
+.mb-3 .btn{
+    border-radius: 35px;
+    width: 400px;
+    height: 40px;
+    border: 1px solid #fe7113;
+    background-color: transparent;
+    color: #fe7113;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+.mb-3 .btn:hover{
+    background-color: rgb(46, 46, 46);
+    color: #ffffff;
+    border-color: #fe7113;
+}
+form .btn-primary:hover{
+    background-color: #fe7113;
+    color: #ffffff;
+    border-color: #fe7113;
+}
