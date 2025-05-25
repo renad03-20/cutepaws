@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
 from apscheduler.schedulers.background import BackgroundScheduler 
+from datetime import datetime, timedelta, timezone
 # from flask_mail import Mail
 
 socketio = SocketIO() 
@@ -54,7 +55,7 @@ def delete_old_adoptions(app):
         
         expired_pets = Pet.query.filter(
             Pet.is_adopted == True,
-            Pet.adoption_date <= datetime.utcnow() - timedelta(days=2)
+            Pet.adoption_date <= datetime.now(timezone.utc) - timedelta(minutes=2)
         ).all()
         for pet in expired_pets:
             db.session.delete(pet)

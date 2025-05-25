@@ -65,3 +65,30 @@ h2{
     font-weight: bold;
     cursor: pointer;
 }
+
+/* Adopted Pet Overlay */
+.pet-card {
+  position: relative;  /* Required for overlay positioning */
+}
+
+.adopted-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(128, 128, 128, 0.5);  /* 50% transparent gray */
+  z-index: 1;  /* Places overlay above the image */
+}
+
+.adopted-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: red;
+  font-weight: bold;
+  font-size: 1.5rem;
+  z-index: 2;  /* Places label above the overlay */
+  text-shadow: 1px 1px 3px black;  /* Improves readability */
+}

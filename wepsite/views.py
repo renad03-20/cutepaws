@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Blueprint, abort, json, jsonify, render_template, redirect, url_for, flash, request, current_app
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
@@ -91,6 +91,16 @@ def pet_detail(pet_id):
 @views.route('/submit_application/<int:pet_id>', methods=['POST'])
 @login_required
 def submit_application(pet_id):
+
+    existing_appliction = AdoptionApplication.query.filter_by(
+        user_id = current_user.id,
+        pet_id = pet_id
+    ).first()
+
+    if existing_appliction:
+        flash('you have already applied for this pet', 'error')
+        return redirect(url_for('views.pet_detail', pet_id=pet_id))
+    
     if request.method == 'POST':
         # Get form data
         form_data = {
@@ -252,7 +262,7 @@ def mark_adopted(pet_id):
 
     pet = Pet.query.get_or_404(pet_id)
     pet.is_adopted = True
-    pet.application_date = datetime.utcnow()
+    pet.application_date = datetime.now(timezone.utc)
     db.session.commit()
     flash(f'{pet.name} marked as adopted!', 'success')
     return redirect(url_for('views.pet_detail', pet_id=pet.id))

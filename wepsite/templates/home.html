@@ -29,6 +29,10 @@
                 <div class="col-sm-3">
                     <div class="card forphoto h-100 shadow-sm ">
                         <a href="{{ url_for('views.pet_detail', pet_id=pet.id) }}">
+                        {% if pet.is_adopted %}
+                            <div class="adopted-overlay"></div>
+                            <div class="adopted-label">ADOPTED</div>
+                        {% endif %}
                             <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" 
                                  class="card-img-top" 
                                  alt="{{ pet.name }}">

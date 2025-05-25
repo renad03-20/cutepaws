@@ -18,6 +18,7 @@ class Pet(db.Model):
     city           = db.Column(db.String(100))  # Changed from location to city
     image_filename = db.Column(db.String(200))
     is_adopted     = db.Column(db.Boolean, default=False)
+    adoption_date = db.Column(db.DateTime)
     posted_by      = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class AdoptionApplication(db.Model): 

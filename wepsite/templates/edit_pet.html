@@ -1,4 +1,4 @@
-{% extends "pase.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 <div class="container mt-4">
@@ -9,7 +9,23 @@
       <label class="form-label">Name</label>
       <input type="text" class="form-control" name="name" value="{{ pet.name }}" required>
     </div>
-    <!-- Add other fields (age, breed, city, description) similarly -->
+    <div class="mb-3">
+      <label class="form-label">Age</label>
+      <input type="text" class="form-control" name="age" value="{{ pet.age }}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Breed</label>
+      <input type="text" class="form-control" name="breed" value="{{ pet.breed }}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea class="form-control" name="description" rows="3" required>{{ pet.description }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Current Image</label>
+      <div>
+        <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" class="img-thumbnail" alt="{{ pet.name }}" style="max-width: 200px;">
+      </div>
     
     <div class="mb-3">
       <label class="form-label">Update Image (Optional)</label>
