@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from flask import Blueprint, abort, json, jsonify, render_template, redirect, url_for, flash, request, current_app
 from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
@@ -92,6 +92,7 @@ def pet_detail(pet_id):
 @login_required
 def submit_application(pet_id):
 
+    # Check if user already applied
     existing_appliction = AdoptionApplication.query.filter_by(
         user_id = current_user.id,
         pet_id = pet_id
@@ -261,11 +262,19 @@ def mark_adopted(pet_id):
         abort(403)
 
     pet = Pet.query.get_or_404(pet_id)
-    pet.is_adopted = True
-    pet.application_date = datetime.now(timezone.utc)
-    db.session.commit()
-    flash(f'{pet.name} marked as adopted!', 'success')
-    return redirect(url_for('views.pet_detail', pet_id=pet.id))
+    try:
+        pet.is_deleted = True
+
+        AdoptionApplication.query.filter_by(pet_id=pet_id).update(
+            {'status': 'archived'}
+        )
+        db.session.commit()
+        flash(f'{pet.name} has been archived', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error archiving pet: {str(e)}", "error")
+
+    return redirect(url_for('views.home'))
 
 #####################################################################
 @views.route('/delete_pet/<int:pet_id>')
@@ -275,14 +284,38 @@ def delete_pet(pet_id):
         abort(403)
 
     pet = Pet.query.get_or_404(pet_id)
-    if not pet.is_adopted:
-        flash('only adopted pets can be deleted', 'error')
-    else:
-        db.session.delete(pet)
+    try:
+        #soft delete (archive)
+        pet.is_deleted = True
+        
+        # Delete the pet image file (optional)
+        image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], pet.image_filename)
+        if os.path.exists(image_path):
+            os.remove(image_path)
+        
         db.session.commit()
-        flash(f'{pet.name} has been removed', 'info')
-        return redirect(url_for('views.home'))
+        flash(f"{pet.name} has been archived", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error archiving pet: {str(e)}", "error")
     
+    return redirect(url_for('views.home'))
+    
+def clean_up_adopted_pets():
+    two_days_ago = datetime.now(timezone.utc) - timedelta(days=2)
+    adopted_pets = Pet.query.filter(
+        Pet.is_adopted == True,
+        Pet.adoption_date <= two_days_ago,
+        Pet.is_deleted == False 
+    ).all()
+
+    for pet in adopted_pets:
+        pet.is_deleted = True
+        # Archive all related applications
+        AdoptionApplication.query.filter_by(Pet_id=pet.id).update(
+            {'status': 'archived'}
+        )
+    db.session.commit()
 #####################################################################
 @views.route('/edit_pet/<int:pet_id>', methods=['GET', 'POST'])
 @login_required

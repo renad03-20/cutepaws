@@ -10,7 +10,8 @@ from flask_migrate import Migrate
 from flask_socketio import SocketIO
 from apscheduler.schedulers.background import BackgroundScheduler 
 from datetime import datetime, timedelta, timezone
-# from flask_mail import Mail
+from flask import Flask
+import json
 
 socketio = SocketIO() 
 db = SQLAlchemy()
@@ -88,19 +89,12 @@ def create_app():
         )
         scheduler.start()
 
-    #  # Email settings
-    # app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-    # app.config['MAIL_PORT'] = 587
-    # app.config['MAIL_USE_TLS'] = True
-    # app.config['MAIL_USERNAME'] = 'your-email@gmail.com'
-    # app.config['MAIL_PASSWORD'] = 'your-app-password'  # Use an App Password
-
     db.init_app(app)
     migrate.init_app(app, db) 
 
     socketio.init_app(app) # Initialize SocketIO
 
-    # Mail.init_app(app)
+
 
     from .views import views
     from .auth import auth
@@ -123,14 +117,8 @@ def create_app():
 
     app.cli.add_command(create_admin)
 
-
+    @app.template_filter('fromjson')
+    def fromjson_filter(s):
+        return json.loads(s)
 
     return app
-# def create_database(app):
-#     from .models import User  # ✅ Moved here too (in case you do model stuff during db creation)
-                                                     
-#     db_path = os.path.join(app.root_path, DB_NAME)
-#     if not os.path.exists(db_path):
-#         with app.app_context():
-#             db.create_all()
-#             print('Created Database')

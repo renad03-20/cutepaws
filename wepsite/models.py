@@ -18,8 +18,16 @@ class Pet(db.Model):
     city           = db.Column(db.String(100))  # Changed from location to city
     image_filename = db.Column(db.String(200))
     is_adopted     = db.Column(db.Boolean, default=False)
+    is_deleted = db.Column(db.Boolean, default=False)
     adoption_date = db.Column(db.DateTime)
     posted_by      = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # Relationships with cascade delete
+    applications = db.relationship(
+        'AdoptionApplication', 
+        backref="pet", 
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
 
 class AdoptionApplication(db.Model): 
     id = db.Column(db.Integer, primary_key=True)
@@ -28,7 +36,12 @@ class AdoptionApplication(db.Model):
     application_date = db.Column(db.DateTime, default=func.now())
     answers = db.Column(db.Text)  
     status = db.Column(db.String(20), default='pending')  
-    pet = db.relationship('Pet', backref='adoption_applications')
+    messages = db.relationship(
+        'Message', 
+        backref='application', 
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
 
 
 class Message(db.Model):
