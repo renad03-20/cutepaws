@@ -14,11 +14,14 @@ views = Blueprint('views', __name__)
 @login_required   
 def home():
     city = request.args.get('city', '')
+
+    # Base query - only show non-deleted pets
+    query = Pet.query.filter(Pet.is_deleted == False) 
     
     if city:
         pets = Pet.query.filter_by(city=city).all()
-    else:
-        pets = Pet.query.all()
+        
+    pets = query.all()
     
     return render_template('home.html', 
                          user=current_user, 
@@ -105,12 +108,15 @@ def submit_application(pet_id):
     if request.method == 'POST':
         # Get form data
         form_data = {
-            'reason': request.form.get('reason'),
+            'similarity': request.form.get('similarity'),
             'housing': request.form.get('housing'),
-            'landlord_approval': request.form.get('landlord_approval'),
-            'other_pets': request.form.get('other_pets'),
-            'pets_description': request.form.get('pets_description'),
-            'caretaker': request.form.get('caretaker')
+            'confirmation': request.form.get('confirmation'),
+            'is_the_cat_alone': request.form.get('is_the_cat_alone'),
+            'financial': request.form.get('housing'),
+            'planning_to_move': request.form.get('planning_to_move'),
+            'deal_with_behavioral_problems': request.form.get('deal_with_behavioral_problems'),
+            'committed_caring': request.form.get('committed_caring'),
+            'backup_plan': request.form.get('backup_plan')
         }
         
         # Create new application
@@ -159,14 +165,21 @@ def handle_join_room(data):
 #####################################################################
 @socketio.on('send_message')
 def handle_send_message(data):
-    application_id = data['application_id']
-    content = data['content']
+    last_message = Message.query.filter_by(
+        application_id = data['application_id'],
+        sender_id=current_user.id,
+        content = data['content']
+    ).order_by(Message.timestamp.desc()).first()
 
+    if last_message and last_message.content == data['content'] and \
+    (datetime.now(timezone.utc)- last_message.timestamp).seconds < 2:
+        return # Ignore duplicate within 2 seconds
+    
     # Save to database
     new_message = Message(
-        application_id=application_id,
+        application_id=data['application_id'],
         sender_id=current_user.id,
-        content=content  
+        content=data['content']
     )
 
     db.session.add(new_message)
@@ -174,21 +187,21 @@ def handle_send_message(data):
 
     emit('new_message', {
         'sender': current_user.first_name,
-        'content': content,
+        'content': data['content'],
         'timestamp': new_message.timestamp.strftime('%b %d, %I:%M %p')
-    }, room=application_id)
+    }, room=data['application_id'])
 
 #####################################################################
 @views.route('/messages/<int:application_id>', methods=['GET', 'POST'])
 @login_required
 def messages(application_id):
     application = AdoptionApplication.query.get_or_404(application_id)
-    
+
     # Ensure the current user is either the applicant or admin
     if current_user.id is None or application.user_id is None or (current_user.id != application.user_id and not current_user.is_admin):
         flash("You don't have permission to view these messages.", "error")
         return redirect(url_for('views.home'))
-    
+
     if request.method == 'POST':
         content = request.form.get('message')
         if content:
@@ -202,14 +215,14 @@ def messages(application_id):
 
     # Fetch all messages for this application
     messages = Message.query.filter_by(application_id=application_id).order_by(Message.timestamp).all()
-    
+
     # Mark messages as read if the current user is the recipient
     messages_to_update = []
     for msg in messages:
         if msg.sender_id != current_user.id and not msg.is_read:
             msg.is_read = True
             messages_to_update.append(msg)
-    
+
     if messages_to_update:
         db.session.commit()
 
@@ -225,7 +238,7 @@ def messages(application_id):
             Message.sender_id != current_user.id,
             Message.is_read == False
         ).count()
-    
+
     return render_template(
         'messages.html',
         user=current_user,
@@ -234,7 +247,6 @@ def messages(application_id):
         pet=application.pet,
         applications=applications  # Pass applications with unread counts
     )
-
 #####################################################################
 @views.route('/applications')
 @login_required
@@ -263,18 +275,16 @@ def mark_adopted(pet_id):
 
     pet = Pet.query.get_or_404(pet_id)
     try:
-        pet.is_deleted = True
-
-        AdoptionApplication.query.filter_by(pet_id=pet_id).update(
-            {'status': 'archived'}
-        )
+        pet.is_adopted = True
+        pet.adoption_date = datetime.now(timezone.utc)
         db.session.commit()
-        flash(f'{pet.name} has been archived', 'success')
+        flash(f'{pet.name} marked as adopted will be archived after two days', 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f"Error archiving pet: {str(e)}", "error")
+        flash(f"Error: {str(e)}", "error")
 
-    return redirect(url_for('views.home'))
+
+    return redirect(url_for('views.pet_detail', pet_id=pet.id))
 
 #####################################################################
 @views.route('/delete_pet/<int:pet_id>')
@@ -287,12 +297,7 @@ def delete_pet(pet_id):
     try:
         #soft delete (archive)
         pet.is_deleted = True
-        
-        # Delete the pet image file (optional)
-        image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], pet.image_filename)
-        if os.path.exists(image_path):
-            os.remove(image_path)
-        
+
         db.session.commit()
         flash(f"{pet.name} has been archived", "success")
     except Exception as e:

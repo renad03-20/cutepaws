@@ -51,16 +51,29 @@ def create_admin():
 
 def delete_old_adoptions(app):
     with app.app_context():
-        from .models import Pet
-        from datetime import datetime, timedelta
+        from .models import Pet, AdoptionApplication
+        from datetime import datetime, timedelta, timezone
         
         expired_pets = Pet.query.filter(
             Pet.is_adopted == True,
-            Pet.adoption_date <= datetime.now(timezone.utc) - timedelta(minutes=2)
+            Pet.adoption_date <= datetime.now(timezone.utc) - timedelta(minutes=2),
+            Pet.is_deleted == False  # Only process active records
         ).all()
+
         for pet in expired_pets:
-            db.session.delete(pet)
-        db.session.commit()
+            try:
+                #soft delete pet 
+                pet.is_deleted = True
+
+                AdoptionApplication.query.filter_by(pet_id=pet.id).update(
+                    {'status': 'archived'}
+                )
+                db.session.commit()
+                print(f'erchived pet {pet.id} {pet.name}') #this only for development in Deploying I'll use import logging, logger = logging.getLogger(__name__), logger.info(f"Archived pet {pet.id} ({pet.name})")
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error archiving pet {pet.id}: {str(e)}")
+        
 
 def create_app():
     app = Flask(__name__)
@@ -84,10 +97,12 @@ def create_app():
         scheduler.add_job(
             func=delete_old_adoptions,
             trigger='interval',
-            hours=24,  # Runs daily
+            hours=6,  # Runs daily
+            id='pet_cleanup_job',
             args=[app]  # Pass app for context
         )
         scheduler.start()
+        print("⏰ Scheduler started: Pet cleanup job active")#for testing
 
     db.init_app(app)
     migrate.init_app(app, db) 
@@ -117,8 +132,8 @@ def create_app():
 
     app.cli.add_command(create_admin)
 
-    @app.template_filter('fromjson')
-    def fromjson_filter(s):
+    @app.template_filter('from_json')
+    def from_json_filter(s):
         return json.loads(s)
 
     return app

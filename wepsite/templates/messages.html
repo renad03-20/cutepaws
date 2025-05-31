@@ -3,7 +3,6 @@
 {% block title %}Messages - {{ pet.name if pet else 'Archived Pet' }}{% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/messages.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 {% endblock %}
 
@@ -53,7 +52,7 @@
                     {% for msg in messages %}
                         <div class="mb-3 message" data-message-id="{{ msg.id }}">
                             <div class="d-flex justify-content-{{ 'end' if msg.sender_id == current_user.id else 'start' }}">
-                                <div class="message-bubble bg-{{ 'primary text-white' if msg.sender_id == current_user.id else 'light' }}">
+                                <div class="message-bubble {{ 'bg-primary text-white' if msg.sender_id == current_user.id else 'bg-light' }}">
                                     <small class="d-block fw-bold">
                                         {{ msg.sender.first_name }}
                                         <span class="text-muted ms-2">{{ msg.timestamp.strftime('%b %d, %I:%M %p') }}</span>
@@ -94,9 +93,9 @@
                         {% endif %}
                     </form>
                     {% else %}
-                    <div class="alert alert-warning">
-                        This conversation is archived and no longer active.
-                    </div>
+                        <div class="alert alert-warning">
+                            This conversation is archived and no longer active.
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -105,35 +104,56 @@
 </div>
 
 <script>
-    // Initialize Socket.IO if available
+    document.addEventListener('DOMContentLoaded', function() {
+    const messageContainer = document.querySelector('.message-container');
+    
+    // Auto-scroll to bottom
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+    
+    // Optional: Poll for new messages every 5 seconds
+    setInterval(() => {
+        fetch(window.location.href)
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(html, 'text/html');
+                const newMessages = newDoc.querySelector('.message-container').innerHTML;
+                
+                if (newMessages !== messageContainer.innerHTML) {
+                    messageContainer.innerHTML = newMessages;
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                }
+            });
+    }, 5000);
+});
+</script>
+
+<script>
     let socket;
     try {
         socket = io();
-        
+
         const applicationId = '{{ application.id }}';
         const userId = {{ current_user.id }};
-        
-        // Join the room for this application
-        socket.emit('join_room', {application_id: applicationId});
 
-        // Handle new messages from Socket.IO
+        socket.emit('join_room', { application_id: applicationId });
+
         socket.on('new_message', (data) => {
             const messageContainer = document.querySelector('.message-container');
-            
-            // Check if we already have this message (from polling)
             const existingMessage = document.querySelector(`.message[data-message-id="${data.id}"]`);
+
             if (!existingMessage) {
                 const messageHtml = `
                     <div class="mb-3 message" data-message-id="${data.id}">
                         <div class="d-flex justify-content-${data.sender_id === userId ? 'end' : 'start'}">
-                            <div class="message-bubble bg-${data.sender_id === userId ? 'primary text-white' : 'light'}">
+                            <div class="message-bubble ${data.sender_id === userId ? 'bg-primary text-white' : 'bg-light'}">
                                 <small class="d-block fw-bold">
                                     ${data.sender}
                                     <span class="text-muted ms-2">${data.timestamp}</span>
-                                    ${data.sender_id === userId ? 
-                                        `<span class="ms-2">
-                                            ${data.is_read ? 
-                                                '<i class="bi bi-check2-all text-info" title="Read"></i>' : 
+                                    ${data.sender_id === userId ? `
+                                        <span class="ms-2">
+                                            ${data.is_read ?
+                                                '<i class="bi bi-check2-all text-info" title="Read"></i>' :
                                                 '<i class="bi bi-check2" title="Delivered"></i>'}
                                         </span>` : ''}
                                 </small>
@@ -152,16 +172,13 @@
             e.preventDefault();
             const input = e.target.querySelector('input[name="message"]');
             const content = input.value.trim();
-            
+
             if (content) {
-                // Send via Socket.IO
                 socket.emit('send_message', {
                     application_id: applicationId,
                     content: content
                 });
-                
-                // Also submit the form normally as a fallback
-                e.target.submit();
+                e.target.submit(); // fallback
                 input.value = '';
             }
         });
