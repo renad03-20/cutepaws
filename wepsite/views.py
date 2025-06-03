@@ -153,7 +153,10 @@ def submit_application(pet_id):
 #####################################################################
 @socketio.on('connect')
 def handle_connect():
-    print(f'User {current_user.first_name}, Connected')
+    if current_user.is_authenticated:
+        if current_user.is_admin:
+            join_room(f'admin{current_user.id}')#private admin channel
+        join_room(f'user{current_user.id}')
 
 #####################################################################
 @socketio.on('join_room')
@@ -165,6 +168,7 @@ def handle_join_room(data):
 #####################################################################
 @socketio.on('send_message')
 def handle_send_message(data):
+    
     last_message = Message.query.filter_by(
         application_id = data['application_id'],
         sender_id=current_user.id,
@@ -174,6 +178,9 @@ def handle_send_message(data):
     if last_message and last_message.content == data['content'] and \
     (datetime.now(timezone.utc)- last_message.timestamp).seconds < 2:
         return # Ignore duplicate within 2 seconds
+    
+    application = AdoptionApplication.query.get(data['application_id'])
+    pet = application.pet
     
     # Save to database
     new_message = Message(
@@ -185,11 +192,18 @@ def handle_send_message(data):
     db.session.add(new_message)
     db.session.commit()
 
-    emit('new_message', {
-        'sender': current_user.first_name,
-        'content': data['content'],
-        'timestamp': new_message.timestamp.strftime('%b %d, %I:%M %p')
-    }, room=data['application_id'])
+    # Determine recipients
+    recipients = [f'user{application.user_id}'] # Always send to applicant
+    if not current_user.is_admin:
+        recipients.append(f'admin{pet.posted_by}')
+
+    for room in recipients:
+        emit('new_message', {
+            'id': new_message.id,
+            'sender': current_user.first_name,
+            'content': data['content'],
+            'timestamp': new_message.timestamp.strftime('%b %d, %I:%M %p')
+        }, room=room)
 
 #####################################################################
 @views.route('/messages/<int:application_id>', methods=['GET', 'POST'])
@@ -228,7 +242,9 @@ def messages(application_id):
 
     # Count unread messages for all applications of the current user (or all if admin)
     if current_user.is_admin:
-        applications = AdoptionApplication.query.order_by(AdoptionApplication.id.desc()).all()
+        applications = AdoptionApplication.query.join(Pet).filter(
+            Pet.posted_by == current_user.id
+        ).all()
     else:
         applications = AdoptionApplication.query.filter_by(user_id=current_user.id).order_by(AdoptionApplication.id.desc()).all()
 
@@ -270,6 +286,7 @@ def applications():
 @views.route('/mark_adopted/<int:pet_id>')
 @login_required
 def mark_adopted(pet_id):
+    # Permission check
     if not current_user.is_admin:
         abort(403)
 
@@ -290,6 +307,7 @@ def mark_adopted(pet_id):
 @views.route('/delete_pet/<int:pet_id>')
 @login_required
 def delete_pet(pet_id):
+    # Permission check
     if not current_user.is_admin:
         abort(403)
 
@@ -351,3 +369,14 @@ def edit_pet(pet_id):
         return redirect(url_for('views.pet_detail', pet_id=pet.id))
     
     return render_template('edit_pet.html', pet=pet)
+#####################################################################
+@views.route('/my_applications')
+@login_required
+def my_applications():
+    applications = AdoptionApplication.query.filter_by(
+        user_id = current_user.id
+    ).join(Pet).filter(
+        Pet.is_deleted == False
+    ).all(
+    )
+    return render_template('application.html', applications=applications)

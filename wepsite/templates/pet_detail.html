@@ -78,7 +78,7 @@
 
 
 
-{% if current_user.is_admin %}
+{% if current_user.is_admin and pet.posted_by == current_user.id %}
   <!-- Admin Buttons -->
   <div class="admin-actions mt-3">
     <!-- Edit Button -->

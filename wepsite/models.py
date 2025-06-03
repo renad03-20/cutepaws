@@ -21,6 +21,7 @@ class Pet(db.Model):
     is_deleted = db.Column(db.Boolean, default=False)
     adoption_date = db.Column(db.DateTime)
     posted_by      = db.Column(db.Integer, db.ForeignKey('user.id'))
+    poster = db.relationship('User', foreign_keys=[posted_by]) 
     # Relationships with cascade delete
     applications = db.relationship(
         'AdoptionApplication', 

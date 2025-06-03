@@ -16,6 +16,10 @@
                     <div>
                         <h5 class="mb-0">
                             {% if application.pet and not application.pet.is_deleted %}
+                                {{ application.pet.name }} 
+                                <small class="text-muted">
+                                (Posted by {{ application.pet.poster.first_name }})
+                                </small>
                                 <a href="{{ url_for('views.pet_detail', pet_id=application.pet.id) }}" class="text-decoration-none">
                                     {{ application.pet.name }} ({{ application.pet.breed }})
                                 </a>
@@ -170,6 +174,7 @@
         // Handle form submission with Socket.IO
         document.getElementById('message-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
+
             const input = e.target.querySelector('input[name="message"]');
             const content = input.value.trim();
 
@@ -178,10 +183,39 @@
                     application_id: applicationId,
                     content: content
                 });
-                e.target.submit(); // fallback
+                //e.target.submit(); // fallback
                 input.value = '';
             }
         });
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const data = new FormData(form);
+            const message = data.get("message");
+
+            // create and append the message with sender info 
+            cons newMessage = {
+                text: message,
+                sender_id: userId,
+                sender: '{{ current_user.first_name }}'
+            };
+
+            // add DOM with correct alignment 
+            appendMessage(newMessage);
+            e.target.submit() 
+        });
+        function appendMessage(msg) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('mb-3', 'message');
+
+            if (msg.sender_id === userId) {
+                messageDiv.classList.add('text-end');
+            } else {
+                messageDiv.classList.add('text-start');
+            }
+            messageDiv.textContent = msg.text;
+            document.getElementById("chat-messages").appendChild(messageDiv);
+        }
 
     } catch (e) {
         console.log("Socket.IO not available, falling back to polling");
