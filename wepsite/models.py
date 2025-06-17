@@ -53,3 +53,4 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime, default=func.now())
     is_read = db.Column(db.Boolean, default=False)
     sender = db.relationship('User', foreign_keys=[sender_id])
+    is_deleted = db.Column(db.Boolean, default=False)

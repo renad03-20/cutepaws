@@ -9,7 +9,7 @@
             <tr>
                 <th>Pet</th>
                 <th>Status</th>
-                <th>Messages</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -18,9 +18,16 @@
                     <td>{{ app.pet.name }}</td>
                     <td>{{ app.status }}</td>
                     <td>
+                        <!-- View messages button -->
                         <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn btn-primary btn-sm">
                             View Messages
                         </a>
+                        <!-- Delete Application button -->
+                        {% if current_user.is_admin and app.pet.posted_by == current_user.id or current_user.id == app.user_id %}
+                            <a href="{{ url_for('views.delete_application', application_id=app.id) }}" class="btn btn-danger btn-sm">
+                                Delete
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

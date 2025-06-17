@@ -280,6 +280,12 @@ def applications():
             Message.is_read == False
         ).count()
 
+    # Attah all non-deleted messages to the app
+    app.messages = Message.query.filter_by(
+        application_id=app.id,
+        is_deleted=False
+    ).order_by(Message.timestamp.desc()).all()
+
     return render_template('applications.html', user=current_user, applications=apps)
 
 #####################################################################
@@ -329,15 +335,13 @@ def clean_up_adopted_pets():
     adopted_pets = Pet.query.filter(
         Pet.is_adopted == True,
         Pet.adoption_date <= two_days_ago,
-        Pet.is_deleted == False 
+        Pet.is_deleted == False
     ).all()
 
     for pet in adopted_pets:
         pet.is_deleted = True
-        # Archive all related applications
-        AdoptionApplication.query.filter_by(Pet_id=pet.id).update(
-            {'status': 'archived'}
-        )
+        AdoptionApplication.query.filter_by(pet_id=pet.id).update({'status': 'archived'})
+
     db.session.commit()
 #####################################################################
 @views.route('/edit_pet/<int:pet_id>', methods=['GET', 'POST'])
@@ -380,3 +384,29 @@ def my_applications():
     ).all(
     )
     return render_template('application.html', applications=applications)
+#####################################################################
+@views.route('/delete_application/<int:application_id>')
+@login_required
+def delete_application(application_id):
+    app = AdoptionApplication.query.get_or_404(application_id)
+
+    # Permission checks
+    if current_user.is_admin:
+        if app.pet.posted_by != current_user.id:
+            abort(403)
+    elif current_user.id != app.user_id:
+        abort(403)
+
+    try:
+        # Delete all related messages
+        Message.query.filter_by(application_id=application_id).delete()
+
+        # Delete the application
+        db.session.delete(app)
+        db.session.commit()
+        flash("Application and its messages have been deleted.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Failed to delete: {str(e)}", "error")
+
+    return redirect(url_for('views.applications'))
