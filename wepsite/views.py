@@ -20,8 +20,8 @@ def home():
     
     if city:
         pets = Pet.query.filter_by(city=city).all()
-        
-    pets = query.all()
+    else:
+        pets = query.all()
     
     return render_template('home.html', 
                          user=current_user, 
@@ -272,19 +272,24 @@ def applications():
     else:
         apps = AdoptionApplication.query.filter_by(user_id=current_user.id).order_by(AdoptionApplication.id.desc()).all()
 
-    # Count unread messages for each application
+    # Show message if no applications exist
+    if not apps:
+        flash('No applications found', 'info')
+
+    # Process each application
     for app in apps:
+        # Count unread messages
         app.unread = Message.query.filter(
             Message.application_id == app.id,
             Message.sender_id != current_user.id,
             Message.is_read == False
         ).count()
-
-    # Attah all non-deleted messages to the app
-    app.messages = Message.query.filter_by(
-        application_id=app.id,
-        is_deleted=False
-    ).order_by(Message.timestamp.desc()).all()
+        
+        # Attach all non-deleted messages
+        app.messages = Message.query.filter_by(
+            application_id=app.id,
+            is_deleted=False
+        ).order_by(Message.timestamp.desc()).all()
 
     return render_template('applications.html', user=current_user, applications=apps)
 

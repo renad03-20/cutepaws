@@ -3,7 +3,11 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Your Adoption Applications</h2>
+    {% if current_user %}
+        <h2> {{current_user.name}} Adoption Applications</h2>
+    {% else %}
+        <h2> Your Adoption Applications</h2>
+    {% endif %}
     <table class="table table-striped">
         <thead>
             <tr>
@@ -19,9 +23,11 @@
                     <td>{{ app.status }}</td>
                     <td>
                         <!-- View messages button -->
+                        {% if current_user.is_admin and app.pet.posted_by == current_user.id or current_user.id == app.user_id %}
                         <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn btn-primary btn-sm">
                             View Messages
                         </a>
+                        {% endif %}
                         <!-- Delete Application button -->
                         {% if current_user.is_admin and app.pet.posted_by == current_user.id or current_user.id == app.user_id %}
                             <a href="{{ url_for('views.delete_application', application_id=app.id) }}" class="btn btn-danger btn-sm">
