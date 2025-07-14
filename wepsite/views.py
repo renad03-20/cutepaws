@@ -13,20 +13,66 @@ views = Blueprint('views', __name__)
 @views.route('/home')
 @login_required   
 def home():
-    city = request.args.get('city', '')
+    city_id = request.args.get('city', '')
 
-    # Base query - only show non-deleted pets
-    query = Pet.query.filter(Pet.is_deleted == False) 
+    city_map = {
+    "1": "Riyadh",
+    "2": "Jeddah",
+    "3": "Mecca",
+    "4": "Medina",
+    "5": "Dammam",
+    "6": "Khobar",
+    "7": "Dhahran",
+    "8": "Tabuk",
+    "9": "Abha",
+    "10": "Khamis Mushait",
+    "11": "Hail",
+    "12": "Buraidah",
+    "13": "Najran",
+    "14": "Al Bahah",
+    "15": "Sakakah",
+    "16": "Arar",
+    "17": "Jazan",
+    "18": "Yanbu",
+    "19": "Taif",
+    "20": "Al Hofuf",
+    "21": "Al Mubarraz",
+    "22": "Al Qatif",
+    "23": "Al Khafji",
+    "24": "Al Jubail",
+    "25": "Al Wajh",
+    "26": "Rabigh",
+    "27": "Bisha",
+    "28": "Al Qurayyat",
+    "29": "Sharurah",
+    "30": "Turaif",
+    "31": "Rafha",
+    "32": "Al Ula",
+    "33": "Samtah",
+    "34": "Dawadmi",
+    "35": "Mahd adh Dhahab",
+    "36": "Wadi ad-Dawasir",
+    "37": "Al Lith",
+    "38": "Hotat Bani Tamim",
+    "39": "Al Bukayriyah",
+    "40": "Al Kharj"
+}
     
-    if city:
-        pets = Pet.query.filter_by(city=city).all()
+    selected_city = city_map.get(city_id, '')  # fallback to empty string if invalid
+
+    # Base query
+    query = Pet.query.filter(Pet.is_deleted == False)
+
+    # Filter if city name is found
+    if selected_city:
+        pets = query.filter_by(city=selected_city).all()
     else:
         pets = query.all()
-    
+
     return render_template('home.html', 
-                         user=current_user, 
-                         pets=pets,
-                         selected_city=city)
+                           user=current_user, 
+                           pets=pets,
+                           selected_city=selected_city)
 
 #####################################################################
 
@@ -87,7 +133,51 @@ def add_pet():
 @login_required
 def pet_detail(pet_id):
     pet = Pet.query.get_or_404(pet_id)
-    return render_template('pet_detail.html', user=current_user, pet=pet)
+
+    city_map = {
+    "1": "Riyadh",
+    "2": "Jeddah",
+    "3": "Mecca",
+    "4": "Medina",
+    "5": "Dammam",
+    "6": "Khobar",
+    "7": "Dhahran",
+    "8": "Tabuk",
+    "9": "Abha",
+    "10": "Khamis Mushait",
+    "11": "Hail",
+    "12": "Buraidah",
+    "13": "Najran",
+    "14": "Al Bahah",
+    "15": "Sakakah",
+    "16": "Arar",
+    "17": "Jazan",
+    "18": "Yanbu",
+    "19": "Taif",
+    "20": "Al Hofuf",
+    "21": "Al Mubarraz",
+    "22": "Al Qatif",
+    "23": "Al Khafji",
+    "24": "Al Jubail",
+    "25": "Al Wajh",
+    "26": "Rabigh",
+    "27": "Bisha",
+    "28": "Al Qurayyat",
+    "29": "Sharurah",
+    "30": "Turaif",
+    "31": "Rafha",
+    "32": "Al Ula",
+    "33": "Samtah",
+    "34": "Dawadmi",
+    "35": "Mahd adh Dhahab",
+    "36": "Wadi ad-Dawasir",
+    "37": "Al Lith",
+    "38": "Hotat Bani Tamim",
+    "39": "Al Bukayriyah",
+    "40": "Al Kharj"
+}
+    city_name = city_map.get(str(pet.city), 'Unknwon')
+    return render_template('pet_detail.html', user=current_user, pet=pet, city_name=city_name)
 
 #####################################################################
 

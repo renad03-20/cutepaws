@@ -8,21 +8,14 @@
     <div class="row">
         <!-- Left side - Title -->
         <div class="col-md-8 gx-0 mx-0  ">
-            <h2 >
+            <h2>
                 {% if selected_city %}
-                    Looking for a cat? Select your location
-                {% endif %}
-                
-                {% if selected_city %}
-                    <span class="text-primary">{{ selected_city }}</span>
-                {% endif %}
-                {% if selected_city %}
-                    Pets Available for Adoption in {{ selected_city }}
+                    Pets Available for Adoption in <span class="text-primary">{{ selected_city }}</span>
                 {% else %}
                     Looking for a cat? Select your location
                 {% endif %}
             </h2>
-            
+
             <!-- Cat Photo Grid -->
             <div class="row justify-content-center g-3"> 
                 {% for pet in pets %}

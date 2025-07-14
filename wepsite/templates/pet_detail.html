@@ -20,7 +20,7 @@
             <h1>{{ pet.name }}</h1>
             <p><strong>Age:</strong> {{ pet.age }} years</p>
             <p><strong>Breed:</strong> {{ pet.breed }}</p>
-            <p><strong>Location:</strong> {{ pet.city }}</p>
+            <p><strong>Location:</strong> {{ city_name }}</p>
             <p><strong>Description:</strong> {{ pet.description }}</p>
         {% if not current_user.is_admin and not pet.is_adopted %}
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adoptionModal">

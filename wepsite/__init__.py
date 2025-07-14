@@ -56,7 +56,7 @@ def delete_old_adoptions(app):
         
         expired_pets = Pet.query.filter(
             Pet.is_adopted == True,
-            Pet.adoption_date <= datetime.now(timezone.utc) - timedelta(minutes=2),
+            Pet.adoption_date <= datetime.now(timezone.utc) - timedelta(days=2),
             Pet.is_deleted == False  # Only process active records
         ).all()
 
@@ -69,10 +69,10 @@ def delete_old_adoptions(app):
                     {'status': 'archived'}
                 )
                 db.session.commit()
-                print(f'erchived pet {pet.id} {pet.name}') #this only for development in Deploying I'll use import logging, logger = logging.getLogger(__name__), logger.info(f"Archived pet {pet.id} ({pet.name})")
+                print(f'✅ erchived pet {pet.id} - {pet.name}') #this only for development in Deploying I'll use import logging, logger = logging.getLogger(__name__), logger.info(f"Archived pet {pet.id} ({pet.name})")
             except Exception as e:
                 db.session.rollback()
-                print(f"Error archiving pet {pet.id}: {str(e)}")
+                print(f"❌ Error archiving pet {pet.id}: {str(e)}")
         
 
 def create_app():
