@@ -10,7 +10,7 @@ import os
 
 views = Blueprint('views', __name__)
 
-@views.route('/home')
+@views.route('/')
 @login_required   
 def home():
     city_id = request.args.get('city', '')
