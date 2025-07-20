@@ -202,7 +202,7 @@ def submit_application(pet_id):
             'housing': request.form.get('housing'),
             'confirmation': request.form.get('confirmation'),
             'is_the_cat_alone': request.form.get('is_the_cat_alone'),
-            'financial': request.form.get('housing'),
+            'financial': request.form.get('financial'),
             'planning_to_move': request.form.get('planning_to_move'),
             'deal_with_behavioral_problems': request.form.get('deal_with_behavioral_problems'),
             'committed_caring': request.form.get('committed_caring'),
@@ -252,6 +252,15 @@ def handle_connect():
 @socketio.on('join_room')
 def handle_join_room(data):
     application_id = data['application_id']
+    application = AdoptionApplication.query.get(application_id)
+
+    #verify user has access to this application
+    if not application or (
+        current_user.id != application.user_id and(
+            not current_user.is_admin or application.pet.posted_by != current_user.id
+        )
+    ):
+        return False  # Reject connection
     join_room(application_id)
     emit('status_update', {'message': f'Joined room {application_id}'})
 
@@ -302,7 +311,9 @@ def messages(application_id):
     application = AdoptionApplication.query.get_or_404(application_id)
 
     # Ensure the current user is either the applicant or admin
-    if current_user.id is None or application.user_id is None or (current_user.id != application.user_id and not current_user.is_admin):
+    if current_user.id != application.user_id and (
+    not current_user.is_admin or application.pet.posted_by != current_user.id
+):
         flash("You don't have permission to view these messages.", "error")
         return redirect(url_for('views.home'))
 
@@ -318,7 +329,7 @@ def messages(application_id):
             db.session.commit()
 
     # Fetch all messages for this application
-    messages = Message.query.filter_by(application_id=application_id).order_by(Message.timestamp).all()
+    messages = Message.query.filter_by(application_id=application_id, is_deleted = False).order_by(Message.timestamp).all()
 
     # Mark messages as read if the current user is the recipient
     messages_to_update = []
@@ -358,9 +369,18 @@ def messages(application_id):
 @login_required
 def applications():
     if current_user.is_admin:
-        apps = AdoptionApplication.query.order_by(AdoptionApplication.id.desc()).all()
+        # Admin can only see applications for pets they posted
+        apps = AdoptionApplication.query \
+            .join(Pet) \
+            .filter(Pet.posted_by == current_user.id) \
+            .order_by(AdoptionApplication.id.desc()) \
+            .all()
     else:
-        apps = AdoptionApplication.query.filter_by(user_id=current_user.id).order_by(AdoptionApplication.id.desc()).all()
+        # Regular users can only see their own applications
+        apps = AdoptionApplication.query \
+            .filter_by(user_id=current_user.id) \
+            .order_by(AdoptionApplication.id.desc()) \
+            .all()
 
     # Show message if no applications exist
     if not apps:
@@ -486,18 +506,16 @@ def delete_application(application_id):
     app = AdoptionApplication.query.get_or_404(application_id)
 
     # Permission checks
-    if current_user.is_admin:
-        if app.pet.posted_by != current_user.id:
-            abort(403)
-    elif current_user.id != app.user_id:
+    if not (current_user.id == app.user_id or 
+       (current_user.is_admin and current_user.id == app.pet.posted_by)):
         abort(403)
 
     try:
-        # Delete all related messages
-        Message.query.filter_by(application_id=application_id).delete()
+        # Soft delete all related messages
+        Message.query.filter_by(application_id=application_id).update({'is_deleted': True})
 
-        # Delete the application
-        db.session.delete(app)
+        # soft delete the ap 
+        app.is_deleted = True 
         db.session.commit()
         flash("Application and its messages have been deleted.", "success")
     except Exception as e:

@@ -22,19 +22,28 @@
                     <td>{{ app.pet.name }}</td>
                     <td>{{ app.status }}</td>
                     <td>
-                        <!-- View messages button -->
-                        {% if current_user.is_admin and app.pet.posted_by == current_user.id or current_user.id == app.user_id %}
-                        <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn btn-primary btn-sm">
-                            View Messages
-                        </a>
+                        {% if (current_user.is_admin and app.pet.posted_by == current_user.id) or current_user.id == app.user_id %}
+                            {% if app.status != 'archived' %}
+                                <!-- View Messages Button -->
+                                <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn btn-primary btn-sm">
+                                    View Messages
+                                </a>
+                                
+                                <!-- Delete Application Button -->
+                                <a href="{{ url_for('views.delete_application', application_id=app.id) }}" class="btn btn-danger btn-sm">
+                                    Delete
+                                </a>
+                            {% else %}
+                                <!-- Archived Status Indicator -->
+                                <span class="text-muted">Archived</span>
+                                
+                                <!-- Optional: View Messages button still available even when archived -->
+                                <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn btn-outline-secondary btn-sm">
+                                    View History
+                                </a>
+                            {% endif %}
                         {% endif %}
-                        <!-- Delete Application button -->
-                        {% if current_user.is_admin and app.pet.posted_by == current_user.id or current_user.id == app.user_id %}
-                            <a href="{{ url_for('views.delete_application', application_id=app.id) }}" class="btn btn-danger btn-sm">
-                                Delete
-                            </a>
-                        {% endif %}
-                    </td>
+                </td>
                 </tr>
             {% endfor %}
         </tbody>

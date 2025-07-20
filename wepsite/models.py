@@ -36,7 +36,8 @@ class AdoptionApplication(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     application_date = db.Column(db.DateTime, default=func.now())
     answers = db.Column(db.Text)  
-    status = db.Column(db.String(20), default='pending')  
+    status = db.Column(db.String(20), default='pending')
+    is_deleted = db.Column(db.Boolean, default=False)  
     messages = db.relationship(
         'Message', 
         backref='application', 
