@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Your Applications{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/applications.css') }}">
+{% endblock %}
 {% block content %}
 <div class="container mt-4">
     {% if current_user %}

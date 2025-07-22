@@ -64,8 +64,8 @@ def home():
     query = Pet.query.filter(Pet.is_deleted == False)
 
     # Filter if city name is found
-    if selected_city:
-        pets = query.filter_by(city=selected_city).all()
+    if city_id:
+        pets = query.filter_by(city=city_id).all()
     else:
         pets = query.all()
 
@@ -308,7 +308,10 @@ def handle_send_message(data):
 @views.route('/messages/<int:application_id>', methods=['GET', 'POST'])
 @login_required
 def messages(application_id):
-    application = AdoptionApplication.query.get_or_404(application_id)
+    application = AdoptionApplication.query.get(application_id)
+    if not application:
+        flash('this application does no longer exist','error')
+        return redirect(url_for('views.applications'))
 
     # Ensure the current user is either the applicant or admin
     if current_user.id != application.user_id and (
@@ -321,7 +324,7 @@ def messages(application_id):
         content = request.form.get('message')
         if content:
             new_message = Message(
-                application_id=application_id, 
+                application_id=application_id,
                 sender_id=current_user.id,
                 content=content
             )
@@ -514,8 +517,8 @@ def delete_application(application_id):
         # Soft delete all related messages
         Message.query.filter_by(application_id=application_id).update({'is_deleted': True})
 
-        # soft delete the ap 
-        app.is_deleted = True 
+        # soft delete the app
+        db.session.delete(app)
         db.session.commit()
         flash("Application and its messages have been deleted.", "success")
     except Exception as e:
