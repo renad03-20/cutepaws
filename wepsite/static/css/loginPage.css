@@ -62,3 +62,26 @@ form .btn-primary:hover{
     background-color: rgb(46, 46, 46);
     color: #ffffff;
 }
+@media (max-width: 576px) {
+    .login-form {
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .header img {
+        max-width: 250px;
+    }
+
+    .header h3 {
+        font-size: 1.2rem;
+    }
+
+    .btn-div {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-control {
+        font-size: 0.9rem;
+    }
+}

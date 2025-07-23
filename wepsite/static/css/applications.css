@@ -3,19 +3,20 @@ body {
     color: #f0f0f0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
 .container {
     padding: 2rem;
     background-color: #222;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(255, 165, 0, 0.2);
 }
-
 h2 {
     color: #fe7113;
     margin-bottom: 1.5rem;
 }
-
 .table {
     background-color: #2a2a2a;
     border-collapse: collapse;
@@ -23,7 +24,6 @@ h2 {
     border-radius: 10px;
     overflow: hidden;
 }
-
 .table th,
 .table td {
     padding: 1rem;
@@ -31,7 +31,6 @@ h2 {
     border-bottom: 1px solid #444;
     color: #000000;
 }
-
 .table th {
     background-color: #333;
     color: #fe7113;
@@ -44,7 +43,6 @@ h2 {
 .table-striped tbody tr:nth-child(even) {
     background-color: #252525;
 }
-
 .btn {
     padding: 0.4rem 0.75rem;
     border-radius: 5px;
@@ -54,7 +52,6 @@ h2 {
     letter-spacing: 0.5px;
     transition: all 0.2s ease-in-out;
 }
-
 .btn-primary {
     background-color: #fe7113;
     border: none;
@@ -63,7 +60,6 @@ h2 {
 .btn-primary:hover {
     background-color: #fe7113;
 }
-
 .btn-danger {
     background-color: #ff4d4d;
     border: none;
@@ -72,7 +68,6 @@ h2 {
 .btn-danger:hover {
     background-color: #ff6666;
 }
-
 .btn-outline-secondary {
     border: 1px solid #aaa;
     color: #ccc;
@@ -82,7 +77,26 @@ h2 {
     background-color: #444;
     color: #fff;
 }
-
 .text-muted {
     color: #888 !important;
+}
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.5rem;
+    }
 }

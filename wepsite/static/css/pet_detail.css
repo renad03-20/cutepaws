@@ -48,3 +48,67 @@ strong{
     color: #ffffff;
     border-color: #fe7113;
 }
+@media (max-width: 768px) {
+  .col-md-6 {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 1.5em;
+  }
+
+  p {
+    font-size: 1em;
+  }
+
+  strong {
+    font-size: 1.2em;
+  }
+
+  .col-md-6 .btn {
+    width: 100%;
+    height: auto;
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .btn {
+    width: 100% !important;
+    font-size: 0.9rem;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+  }
+
+  .modal-body label,
+  .modal-body select,
+  .modal-body .form-check-label {
+    font-size: 0.95rem;
+  }
+
+  .form-select,
+  .form-check-input {
+    font-size: 0.9rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .adoptedCat {
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .admin-actions {
+    text-align: center;
+  }
+
+  .admin-actions .btn {
+    margin: 0.25rem 0.5rem;
+  }
+}

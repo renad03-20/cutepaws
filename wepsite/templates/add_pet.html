@@ -7,81 +7,83 @@
 
 {% block content %}
 <div class="container mt-5">
-
   <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/house2.png') }}" class="house-right" alt="Cat House">
-
   <h2 class="mb-4">Add a New Pet</h2>
-  <form method="POST" enctype="multipart/form-data">
-    <div class="mb-3">
-      <label for="name" class="form-label">Pet Name</label>
-      <input type="text" class="form-control" name="name" id="name" required>
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="name" class="form-label">Pet Name</label>
+          <input type="text" class="form-control" name="name" id="name" required>
+        </div>
+        <div class="mb-3">
+          <label for="age" class="form-label">Pet Age</label>
+          <input type="text" class="form-control" name="age" id="age" required>
+        </div>
+        <div class="mb-3">
+          <label for="breed" class="form-label">Pet breed</label>
+          <input type="text" class="form-control" name="breed" id="breed" required>
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="formFile" class="form-label">Pet Image</label>
+          <input class="form-control" type="file" id="formFile" name="image" hidden>
+          <button type="button" class="btn btn-primary" onclick="document.getElementById('formFile').click();">
+            Choose Photo
+          </button>
     </div>
-    <div class="mb-3">
-      <label for="age" class="form-label">Pet Age</label>
-      <input type="text" class="form-control" name="age" id="age" required>
-    </div>
-    <div class="mb-3">
-      <label for="breed" class="form-label">Pet breed</label>
-      <input type="text" class="form-control" name="breed" id="breed" required>
-    </div>
-    <div class="mb-3">
-      <label for="description" class="form-label">Description</label>
-      <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
-    </div>
-    <div class="mb-3">
-      <label for="formFile" class="form-label">Pet Image</label>
-      <input class="form-control" type="file" id="formFile" name="image" hidden>
-      <button type="button" class="btn btn-primary" onclick="document.getElementById('formFile').click();">
-        Choose Photo
-      </button>
-</div>
 
-    <div class="form-group mb-3">
-      <label for="city">City</label>
-      <select class="form-control" id="city" name="city" required>
-        <option value="1">Riyadh</option>
-        <option value="2">Jeddah</option>
-        <option value="3">Mecca</option>
-        <option value="4">Medina</option>
-        <option value="5">Dammam</option>
-        <option value="6">Khobar</option>
-        <option value="7">Dhahran</option>
-        <option value="8">Tabuk</option>
-        <option value="9">Abha</option>
-        <option value="10">Khamis Mushait</option>
-        <option value="11">Hail</option>
-        <option value="12">Buraidah</option>
-        <option value="13">Najran</option>
-        <option value="14">Al Bahah</option>
-        <option value="15">Sakakah</option>
-        <option value="16">Arar</option>
-        <option value="17">Jazan</option>
-        <option value="18">Yanbu</option>
-        <option value="19">Taif</option>
-        <option value="20">Al Hofuf</option>
-        <option value="21">Al Mubarraz</option>
-        <option value="22">Al Qatif</option>
-        <option value="23">Al Khafji</option>
-        <option value="24">Al Jubail</option>
-        <option value="25">Al Wajh</option>
-        <option value="26">Rabigh</option>
-        <option value="27">Bisha</option>
-        <option value="28">Al Qurayyat</option>
-        <option value="29">Sharurah</option>
-        <option value="30">Turaif</option>
-        <option value="31">Rafha</option>
-        <option value="32">Al Ula</option>
-        <option value="33">Samtah</option>
-        <option value="34">Dawadmi</option>
-        <option value="35">Mahd adh Dhahab</option>
-        <option value="36">Wadi ad-Dawasir</option>
-        <option value="37">Al Lith</option>
-        <option value="38">Hotat Bani Tamim</option>
-        <option value="39">Al Bukayriyah</option>
-        <option value="40">Al Kharj</option>
-      </select>
+        <div class="form-group mb-3">
+          <label for="city">City</label>
+          <select class="form-control" id="city" name="city" required>
+            <option value="1">Riyadh</option>
+            <option value="2">Jeddah</option>
+            <option value="3">Mecca</option>
+            <option value="4">Medina</option>
+            <option value="5">Dammam</option>
+            <option value="6">Khobar</option>
+            <option value="7">Dhahran</option>
+            <option value="8">Tabuk</option>
+            <option value="9">Abha</option>
+            <option value="10">Khamis Mushait</option>
+            <option value="11">Hail</option>
+            <option value="12">Buraidah</option>
+            <option value="13">Najran</option>
+            <option value="14">Al Bahah</option>
+            <option value="15">Sakakah</option>
+            <option value="16">Arar</option>
+            <option value="17">Jazan</option>
+            <option value="18">Yanbu</option>
+            <option value="19">Taif</option>
+            <option value="20">Al Hofuf</option>
+            <option value="21">Al Mubarraz</option>
+            <option value="22">Al Qatif</option>
+            <option value="23">Al Khafji</option>
+            <option value="24">Al Jubail</option>
+            <option value="25">Al Wajh</option>
+            <option value="26">Rabigh</option>
+            <option value="27">Bisha</option>
+            <option value="28">Al Qurayyat</option>
+            <option value="29">Sharurah</option>
+            <option value="30">Turaif</option>
+            <option value="31">Rafha</option>
+            <option value="32">Al Ula</option>
+            <option value="33">Samtah</option>
+            <option value="34">Dawadmi</option>
+            <option value="35">Mahd adh Dhahab</option>
+            <option value="36">Wadi ad-Dawasir</option>
+            <option value="37">Al Lith</option>
+            <option value="38">Hotat Bani Tamim</option>
+            <option value="39">Al Bukayriyah</option>
+            <option value="40">Al Kharj</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Pet</button>
+      </form>
     </div>
-    <button type="submit" class="btn btn-primary">Add Pet</button>
-  </form>
+  </div>
 </div>
 {% endblock %}

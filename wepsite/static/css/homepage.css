@@ -15,9 +15,10 @@ h2{
     background-color: #000000;
     border-radius: 10px;
     padding: 10px;
+    margin: 0 auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     width: auto;
-    height: auto;
+    height: 100%;
     align-items: center;
     justify-content: center;
     color: white;
@@ -33,35 +34,35 @@ h2{
     font-size: 30px;
     font-weight: bold;
     color: #fe7113;
-    padding: 0;
-    height: 100px;
-    width: 200px;
+    padding: 20px;
+    height: auto;
+    width: 100%;
     border-radius: 50px;
     background-color: #000000
 }
 .col-md-4 .card-title{
-    margin-bottom: 20px;
-    font-size: 11px;
-    font-weight: light;
+    margin-bottom: 1rem;
+    font-size: 16px;
+    font-weight: bold;
     color: #fe7113;
     padding: 0;
     background-color: #000000
 }
 .form-group .form-control {
     margin-bottom: 20px;
-    padding: 0px;
-    width: 200px;
-    height: 20px;
+    padding: 0.5rem;
+    width: 100%;
+    height: 40px;
     
 }
 .for-btn .btn{
     border-radius: 35px;
-    width: 200px;
-    height: 30px;
+    width: 100px;
+    height: 40px;
     border: 2px solid #fe7113;
     background-color: #1a1a1a;
     color: #fe7113;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -91,4 +92,20 @@ h2{
   font-size: 1.5rem;
   z-index: 2;  /* Places label above the overlay */
   text-shadow: 1px 1px 3px black;  /* Improves readability */
+}
+@media (max-width: 768px) {
+    h2 {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .form-group .form-control,
+    .for-btn .btn {
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .col-md-4 {
+        margin-top: 2rem;
+    }
 }

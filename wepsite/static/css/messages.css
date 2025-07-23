@@ -105,4 +105,40 @@
 .badge.bg-secondary {
     background-color: #757575;
 }
+@media (max-width: 576px) {
+    .message-bubble {
+        max-width: 90%;
+        font-size: 0.9rem;
+    }
+}
+@media (max-width: 576px) {
+    .card-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
 
+    .card-header h5 {
+        font-size: 1rem;
+    }
+
+    .card-header .badge {
+        margin-top: 0.5rem;
+    }
+}
+@media (max-width: 576px) {
+    .input-group .form-control {
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        font-size: 0.9rem;
+        padding: 0.375rem 0.5rem;
+    }
+}
+@media (max-width: 576px) {
+    .quick-reply {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+}
