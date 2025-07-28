@@ -6,58 +6,168 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 position-relative text-center">
-
-    <div class="header mb-4">
-        <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/roof1.png') }}" alt="House" class="img-fluid" style="max-width: 400px;">
-        <h3 class="text-center mt-3">Create an Account</h3>
+<!-- Hero Section -->
+<section class="signup-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="hero-title">Join Our Community! 🏠</h1>
+                    <p class="hero-subtitle">Start your journey to give rescued cats a second chance at happiness</p>
+                </div>
+            </div>
+        </div>
     </div>
+    <div class="scroll-indicator" onclick="document.getElementById('signup-form').scrollIntoView({behavior: 'smooth'})">
+        ↓
+    </div>
+</section>
 
-    <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/orangecat.png') }}" class="cat cat-left" alt="Orange Cat">
-    <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/greycat.png') }}" class="cat cat-right" alt="Gray Cat">
+<!-- Signup Form Section -->
+<section class="signup-section" id="signup-form">
+    <div class="container">
+        <!-- Floating decorative elements -->
+        <div class="floating-element">🐱</div>
+        <div class="floating-element">🏠</div>
+        <div class="floating-element">❤️</div>
+        <div class="floating-element">🌟</div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="signup-container">
+                    <h2 class="signup-title">Create an Account</h2>
+                    
+                    <form method="POST">
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="Enter your email"
+                                   required> 
+                            <div class="form-text">We'll never share your email with anyone else.</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="firstName">First Name</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="firstName" 
+                                   name="firstName"
+                                   placeholder="Enter your first name"
+                                   required> 
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="password1">Password</label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password1" 
+                                   name="password1"
+                                   placeholder="Create a secure password"
+                                   required> 
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="password2">Confirm Password</label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password2" 
+                                   name="password2"
+                                   placeholder="Confirm your password"
+                                   required> 
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button type="submit" class="signup-btn">Create Account</button>
+                            <a href="{{ url_for('auth.login')}}" class="login-btn">Already have an account?</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <div class="wall-background"></div>
+<!-- How It Works Section -->
+<section class="steps-section">
+    <div class="container">
+        <h2 class="steps-title">How It Works</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Create Your Profile</h3>
+                    <p class="step-text">Sign up with your basic information and tell us about what kind of companion you're looking for.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Browse & Connect</h3>
+                    <p class="step-text">Explore profiles of adorable rescued cats, read their stories, and connect with verified rescuers.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Adopt & Transform Lives</h3>
+                    <p class="step-text">Complete the adoption process and welcome your new best friend into a loving forever home.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <form method="POST" class="login-form mx-auto">
-        <div class="mb-3 form-group "> 
-            <label for="email"> Email address</label>
-            <input type="email" 
-            class="form-control" 
-            id="email" 
-            name="email" 
-            placeholder="Enter email"> 
-            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+<!-- Benefits Section -->
+<section class="benefits-section">
+    <div class="container">
+        <div class="benefits-content">
+            <h2 class="benefits-title">Why Choose Adoption?</h2>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">💝</div>
+                        <div class="benefit-text">
+                            <strong>Save a Life:</strong> Every adoption makes room for another rescue cat in need of emergency care.
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🏥</div>
+                        <div class="benefit-text">
+                            <strong>Health Checked:</strong> All our cats are vetted, vaccinated, and ready for their new homes.
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🤝</div>
+                        <div class="benefit-text">
+                            <strong>Ongoing Support:</strong> Connect directly with experienced rescuers who know each cat's personality.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🔒</div>
+                        <div class="benefit-text">
+                            <strong>Safe & Verified:</strong> Only verified rescuers can list cats, ensuring legitimacy and care.
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">🌍</div>
+                        <div class="benefit-text">
+                            <strong>Make a Difference:</strong> Join a community dedicated to reducing pet overpopulation through adoption.
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">💕</div>
+                        <div class="benefit-text">
+                            <strong>Unconditional Love:</strong> Rescued cats often show incredible gratitude and form deep bonds with their adopters.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    
-        <div class="mb-3 form-group">
-            <label for="firstName"> First Name</label>
-            <input type="text" 
-            class="form-control" 
-            id="firstName" 
-            name="firstName"
-            placeholder="Enter first name"> 
-        </div>
-    
-        <div class="mb-3 form-group">
-            <label for="password1"> Enter password</label>
-            <input type="password" 
-            class="form-control" 
-            id="password1" 
-            name="password1"
-            placeholder="Enter password"> 
-        </div>
-        <div class="mb-3 form-group">
-            <label for="password2"> Password Confirmation </label>
-            <input type="password" 
-            class="form-control" 
-            id="password2" 
-            name="password2"
-            placeholder="Confirm password"> 
-        </div>
-        <div class="btn-div mb-3 d-flex justify-content-center gap-3">
-            <button type="submit" class="btn btn-primary">Sign Up</button>
-            <a href="{{ url_for('auth.login')}}" class="btn btn-outline-secondary">Login</a>
-        </div>
-    </form>
-</div>
+    </div>
+</section>
 {% endblock %}

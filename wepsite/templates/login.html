@@ -2,43 +2,99 @@
 {% block title%} Login {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/loginpage.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/loginPage.css') }}">
 {% endblock %}
+
 {% block content %}
-<div class="container mt-5 position-relative text-center">
-
-    <div class="header mb-4">
-        <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/roof1.png') }}" alt="House" class="img-fluid" style="max-width: 400px;">
-        <h3 class="text-center mt-3">Log to your account</h3>
+<!-- Hero Section -->
+<section class="login-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="hero-title">Welcome Back! 🐾</h1>
+                    <p class="hero-subtitle">Ready to continue your journey in connecting rescued cats with loving homes?</p>
+                </div>
+            </div>
+        </div>
     </div>
+    <div class="scroll-indicator" onclick="document.getElementById('login-form').scrollIntoView({behavior: 'smooth'})">
+        ↓
+    </div>
+</section>
 
-    <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/orangecat.png') }}" class="cat cat-left" alt="Orange Cat">
-    <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/greycat.png') }}" class="cat cat-right" alt="Gray Cat">
+<!-- Login Form Section -->
+<section class="login-section" id="login-form">
+    <div class="container">
+        <!-- Floating decorative elements -->
+        <div class="floating-element">🐱</div>
+        <div class="floating-element">🏠</div>
+        <div class="floating-element">❤️</div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="login-container">
+                    <h2 class="login-title">Log to your account</h2>
+                    
+                    <form method="POST">
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="Enter your email"
+                                   required> 
+                            <div class="form-text">We'll never share your email with anyone else.</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password"
+                                   placeholder="Enter your password"
+                                   required> 
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button type="submit" class="login-btn">Login</button>
+                            <a href="{{ url_for('auth.sign_up') }}" class="signup-btn">Create an account</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <div class="wall-background"></div>
-    
-    <form method="POST" class="login-form mx-auto">
-        <div class="mb-3 form-group">
-            <label class="form-label" for="email">Email Address</label>
-            <input type="email" 
-            class="form-control" 
-            id="email" 
-            name="email" 
-            placeholder="Enter email"> 
-            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Secure Access</h3>
+                    <p class="feature-text">Your account is protected with industry-standard security measures.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🐾</div>
+                    <h3 class="feature-title">Find Your Match</h3>
+                    <p class="feature-text">Browse verified profiles of cats ready for their forever homes.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">❤️</div>
+                    <h3 class="feature-title">Make a Difference</h3>
+                    <p class="feature-text">Every adoption saves a life and makes room for another rescue.</p>
+                </div>
+            </div>
         </div>
-        <div class="mb-3 form-group">
-            <label class="form-label" for="password">Enter Password</label>
-            <input type="password" 
-            class="form-control" 
-            id="password" 
-            name="password"
-            placeholder="Enter password"> 
-        </div>
-        <div class="btn-div mb-3 d-flex justify-content-center gap-3">
-            <button type="submit" class="btn btn-primary">Login</button>
-            <a href="{{ url_for('auth.sign_up') }}" class="btn btn-outline-primary">Create an account</a>
-        </div>
-    </form>
-</div>
+    </div>
+</section>
 {% endblock %}

@@ -4,53 +4,115 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/applications.css') }}">
 {% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    {% if current_user %}
-        <h2> {{current_user.name}} Adoption Applications</h2>
-    {% else %}
-        <h2> Your Adoption Applications</h2>
-    {% endif %}
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Pet</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for app in applications %}
-                    <tr>
-                        <td>{{ app.pet.name }}</td>
-                        <td>{{ app.status }}</td>
-                        <td>
-                            {% if (current_user.is_admin and app.pet.posted_by == current_user.id) or current_user.id == app.user_id %}
-                                {% if app.status != 'archived' %}
-                                    <!-- View Messages Button -->
-                                    <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn btn-primary btn-sm">
-                                        View Messages
-                                    </a>
-                                    <!-- Delete Application Button -->
-                                    <a href="{{ url_for('views.delete_application', application_id=app.id) }}" class="btn btn-danger btn-sm">
-                                        Delete
-                                    </a>
-                                {% else %}
-                                    <!-- Archived Status Indicator -->
-                                    <span class="text-muted">Archived</span>
-                                    
-                                    <!-- Optional: View Messages button still available even when archived -->
-                                    <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn btn-outline-secondary btn-sm">
-                                        View History
-                                    </a>
-                                {% endif %}
-                            {% endif %}
-                    </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<!-- Hero Section -->
+<section class="applications-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="hero-title">Your Applications 📋</h1>
+                    <p class="hero-subtitle">Track your adoption journey and connect with rescuers</p>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+
+<!-- Main Applications Section -->
+<section class="main-section">
+    <div class="container">
+        <!-- Floating decorative elements -->
+        <div class="floating-element">🐱</div>
+        <div class="floating-element">📝</div>
+        <div class="floating-element">💌</div>
+        
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="applications-container">
+                    {% if current_user %}
+                        <h2 class="section-title">
+                            <span class="user-greeting">{{current_user.name}}</span> Adoption Applications
+                        </h2>
+                    {% else %}
+                        <h2 class="section-title">Your Adoption Applications</h2>
+                    {% endif %}
+                    
+                    {% if applications %}
+                        <div class="table-container">
+                            <table class="applications-table">
+                                <thead>
+                                    <tr>
+                                        <th>🐾 Pet</th>
+                                        <th>📊 Status</th>
+                                        <th>⚡ Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in applications %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ app.pet.name }}</strong>
+                                            </td>
+                                            <td>
+                                                {% if app.status == 'pending' %}
+                                                    <span class="status-badge status-pending">{{ app.status }}</span>
+                                                {% elif app.status == 'approved' %}
+                                                    <span class="status-badge status-approved">{{ app.status }}</span>
+                                                {% elif app.status == 'rejected' %}
+                                                    <span class="status-badge status-rejected">{{ app.status }}</span>
+                                                {% elif app.status == 'archived' %}
+                                                    <span class="status-badge status-archived">{{ app.status }}</span>
+                                                {% else %}
+                                                    <span class="status-badge">{{ app.status }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if (current_user.is_admin and app.pet.posted_by == current_user.id) or current_user.id == app.user_id %}
+                                                    {% if app.status != 'archived' %}
+                                                        <div class="action-buttons">
+                                                            <!-- View Messages Button -->
+                                                            <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn-custom btn-view">
+                                                                💬 View Messages
+                                                            </a>
+                                                            <!-- Delete Application Button -->
+                                                            <a href="{{ url_for('views.delete_application', application_id=app.id) }}" class="btn-custom btn-delete" onclick="return confirm('Are you sure you want to delete this application?')">
+                                                                🗑️ Delete
+                                                            </a>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="action-buttons">
+                                                            <!-- Archived Status Indicator -->
+                                                            <span class="archived-text">📁 Archived</span>
+                                                            
+                                                            <!-- Optional: View Messages button still available even when archived -->
+                                                            <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn-custom btn-history">
+                                                                📜 View History
+                                                            </a>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🐱</div>
+                            <h3 class="empty-state-title">No Applications Yet</h3>
+                            <p class="empty-state-text">
+                                You haven't submitted any adoption applications yet.<br>
+                                Browse available pets and start your adoption journey!
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
