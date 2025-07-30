@@ -8,108 +8,143 @@
 <script src="{{ url_for('static', filename='js/pet_detail.js') }}"></script> 
 {% endblock %}
  
-{% block title %}Pet Details{% endblock %}  
+{% block title %}{{ pet.name }} - Pet Details{% endblock %}  
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-6">
-            <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" class="img-fluid" alt="{{ pet.name }}"> 
-        </div>
-        <div class="col-md-6">
-            <h1>{{ pet.name }}</h1>
-            <p><strong>Age:</strong> {{ pet.age }} years</p>
-            <p><strong>Breed:</strong> {{ pet.breed }}</p>
-            <p><strong>Location:</strong> {{ city_name }}</p>
-            <p><strong>Description:</strong> {{ pet.description }}</p>
-        {% if not current_user.is_admin and not pet.is_adopted %}
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adoptionModal">
-                Apply for Adoption
-            </button>
-        {% endif %}
-            {% if pet.is_adopted %}
-                <p class="adoptedCat" style="color: red;">This pet has been adopted.</p>
-        {% endif %}
+<!-- Hero Section -->
+<section class="pet-detail-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="hero-title">Meet {{ pet.name }} 🐾</h1>
+                    <p class="hero-subtitle">A wonderful companion looking for their forever home</p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Mark as Adopted Modal -->
-<div class="modal fade" id="confirmAdoptModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirm Adoption</h5>
-      </div>
-      <div class="modal-body">
-        <p>Mark {{ pet.name }} as adopted? This will add a gray overlay and schedule removal in 2 days.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        {% if pet.id %}
-        <a href="{{ url_for('views.mark_adopted', pet_id=pet.id) }}" class="btn btn-primary">Confirm</a>
-        {% else %}
-        <p class="text-danger">Pet ID is not available.</p>
-        {% endif %}
-      </div>
+<!-- Main Pet Detail Section -->
+<section class="main-section">
+    <div class="container">
+        <!-- Floating decorative elements -->
+        <div class="floating-element">🐱</div>
+        <div class="floating-element">❤️</div>
+        <div class="floating-element">🏠</div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="pet-detail-container">
+                    {% if pet.is_adopted %}
+                        <div class="adopted-banner">
+                            <i class="adopted-icon">✅</i>
+                            <span class="adopted-text">This beautiful pet has found their forever home!</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <!-- Pet Image -->
+                        <div class="col-md-6">
+                            <div class="pet-image-section">
+                                <div class="image-container">
+                                    {% if pet.is_adopted %}
+                                        <div class="adopted-overlay"></div>
+                                    {% endif %}
+                                    <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" 
+                                         class="pet-image" 
+                                         alt="{{ pet.name }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pet Information -->
+                        <div class="col-md-6">
+                            <div class="pet-info-section">
+                                <h1 class="pet-name">{{ pet.name }}</h1>
+                                
+                                <div class="pet-details">
+                                    <div class="detail-item">
+                                        <span class="detail-icon">🎂</span>
+                                        <span class="detail-label">Age:</span>
+                                        <span class="detail-value">{{ pet.age }}</span>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <span class="detail-icon">🐾</span>
+                                        <span class="detail-label">Breed:</span>
+                                        <span class="detail-value">{{ pet.breed }}</span>
+                                    </div>
+                                    
+                                    <div class="detail-item">
+                                        <span class="detail-icon">📍</span>
+                                        <span class="detail-label">Location:</span>
+                                        <span class="detail-value">{{ city_name }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="pet-description">
+                                    <h3 class="description-title">About {{ pet.name }}</h3>
+                                    <p class="description-text">{{ pet.description }}</p>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="action-buttons">
+                                    {% if not current_user.is_admin and not pet.is_adopted %}
+                                        <button class="adoption-btn" data-bs-toggle="modal" data-bs-target="#adoptionModal">
+                                            <span class="btn-icon">💝</span>
+                                            <span class="btn-text">Apply for Adoption</span>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Actions -->
+                    {% if current_user.is_admin and pet.posted_by == current_user.id %}
+                    <div class="admin-actions">
+                        <h4 class="admin-title">🔧 Admin Actions</h4>
+                        <div class="admin-buttons">
+                            <a href="{{ url_for('views.edit_pet', pet_id=pet.id) }}" class="admin-btn edit-btn">
+                                <span class="btn-icon">✏️</span>
+                                <span class="btn-text">Edit Pet</span>
+                            </a>
+                            
+                            {% if not pet.is_adopted %}
+                                <button class="admin-btn adopt-btn" data-bs-toggle="modal" data-bs-target="#confirmAdoptModal">
+                                    <span class="btn-icon">✅</span>
+                                    <span class="btn-text">Mark as Adopted</span>
+                                </button>
+                            {% else %}
+                                <button class="admin-btn delete-btn" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                    <span class="btn-icon">🗑️</span>
+                                    <span class="btn-text">Delete Pet</span>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+</section>
 
-<!-- Delete Pet Modal -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
-    <div class="modal-dialog">
+<!-- Adoption Application Modal -->
+<div class="modal fade" id="adoptionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"> Confirm deletion </h5>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete {{ pet.name }}? This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Cancel</button>
-                <a href="{{ url_for('views.delete_pet', pet_id=pet.id)}}" class="btn btn-danger">
-                    Delete
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-{% if current_user.is_admin and pet.posted_by == current_user.id %}
-  <!-- Admin Buttons -->
-  <div class="admin-actions mt-3">
-    <!-- Edit Button -->
-    <a href="{{ url_for('views.edit_pet', pet_id=pet.id) }}" class="btn btn-warning">
-      <i class="bi bi-pencil"></i> Edit
-    </a>
-    
-    <!-- Delete/Adopt Button -->
-    {% if not pet.is_adopted %}
-      <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmAdoptModal">
-        <i class="bi bi-check-circle"></i> Mark as Adopted
-      </button>
-    {% else %}
-      <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
-        <i class="bi bi-trash"></i> Delete
-      </button>
-    {% endif %}
-{% endif %}
-  </div>
-
-<div class="modal fad " id="adoptionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Adoption Application for {{ pet.name }}</h5>
+                <h5 class="modal-title">💝 Adoption Application for {{ pet.name }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="adoptionForm" method="POST" action="{{ url_for('views.submit_application', pet_id=pet.id) }}">
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Have you owned a cat (or similar pet) before?</label>
+                    <p class="application-intro">Help us find the perfect match! Please answer these questions honestly.</p>
+                    
+                    <div class="question-group">
+                        <label class="question-label">🐱 Have you owned a cat (or similar pet) before?</label>
                         <select class="form-select" name="similarity" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
@@ -117,64 +152,71 @@
                         </select>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label"> Does everyone in your household agree to adopting a cat? </label>
+                    <div class="question-group">
+                        <label class="question-label">🏠 Does everyone in your household agree to adopting a cat?</label>
                         <select class="form-select" name="housing" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label"> Are you allowed to have pets where you live?</label>
+                    
+                    <div class="question-group">
+                        <label class="question-label">🏡 Are you allowed to have pets where you live?</label>
                         <select class="form-select" name="confirmation" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label"> Will the cat be alone for more than 8 hours a day? </label>
+                    
+                    <div class="question-group">
+                        <label class="question-label">⏰ Will the cat be alone for more than 8 hours a day?</label>
                         <select class="form-select" name="is_the_cat_alone" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label"> Do you have the financial ability to pay for vet care if needed? </label>
+                    
+                    <div class="question-group">
+                        <label class="question-label">💰 Do you have the financial ability to pay for vet care if needed?</label>
                         <select class="form-select" name="financial" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label"> Are you planning to move or travel extensively within the next year?  </label>
+                    
+                    <div class="question-group">
+                        <label class="question-label">✈️ Are you planning to move or travel extensively within the next year?</label>
                         <select class="form-select" name="planning_to_move" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">  Are you willing to deal with possible behavioral problems like scratching or accidents? </label>
+                    
+                    <div class="question-group">
+                        <label class="question-label">🎯 Are you willing to deal with possible behavioral problems like scratching or accidents?</label>
                         <select class="form-select" name="deal_with_behavioral_problems" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Are you committed to caring for this cat for its entire life (which could be 15-20 years)? </label>
+                    
+                    <div class="question-group">
+                        <label class="question-label">💖 Are you committed to caring for this cat for its entire life (which could be 15-20 years)?</label>
                         <select class="form-select" name="committed_caring" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
                             <option value="no">No</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label"> Do you have a backup plan for the cat if something happens to you? </label>
+                    
+                    <div class="question-group">
+                        <label class="question-label">🛡️ Do you have a backup plan for the cat if something happens to you?</label>
                         <select class="form-select" name="backup_plan" required>
                             <option value="" disabled selected>Select an option</option>
                             <option value="yes">Yes</option>
@@ -182,16 +224,63 @@
                         </select>
                     </div>
                     
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" name="agreement" id="agreement" required>
-                        <label class="form-check-label" for="agreement">&nbsp;I agree to provide proper care, food, and veterinary attention</label>
+                    <div class="agreement-section">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="agreement" id="agreement" required>
+                            <label class="form-check-label" for="agreement">
+                                ✅ I agree to provide proper care, food, and veterinary attention to {{ pet.name }}
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer justify-content-between"> 
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit Application</button>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="modal-btn submit-btn">
+                        <span class="btn-icon">📨</span>
+                        <span class="btn-text">Submit Application</span>
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Mark as Adopted Modal -->
+<div class="modal fade" id="confirmAdoptModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">✅ Confirm Adoption</h5>
+            </div>
+            <div class="modal-body">
+                <p>Mark {{ pet.name }} as adopted? This will add a celebration overlay and schedule removal in 2 days.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                {% if pet.id %}
+                <a href="{{ url_for('views.mark_adopted', pet_id=pet.id) }}" class="modal-btn confirm-btn">Confirm</a>
+                {% else %}
+                <p class="text-danger">Pet ID is not available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Pet Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">🗑️ Confirm Deletion</h5>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete {{ pet.name }}? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                <a href="{{ url_for('views.delete_pet', pet_id=pet.id) }}" class="modal-btn delete-btn">Delete</a>
+            </div>
         </div>
     </div>
 </div>
