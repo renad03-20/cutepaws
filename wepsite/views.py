@@ -255,12 +255,18 @@ def handle_join_room(data):
     application = AdoptionApplication.query.get(application_id)
 
     #verify user has access to this application
-    if not application or (
-        current_user.id != application.user_id and(
-            not current_user.is_admin or application.pet.posted_by != current_user.id
-        )
-    ):
-        return False  # Reject connection
+    has_access = False
+    if application:
+        # user is the applicant 
+        if current_user.id == application.user_id:
+            has_access = True
+        
+        #user is admin who posted the pet
+        elif current_user.is_admin and application.pet.posted_by == current_user.id:
+            has_access = True
+
+    if not has_access:
+        return False
     join_room(application_id)
     emit('status_update', {'message': f'Joined room {application_id}'})
 
@@ -275,7 +281,7 @@ def handle_send_message(data):
     ).order_by(Message.timestamp.desc()).first()
 
     if last_message and last_message.content == data['content'] and \
-    (datetime.now(timezone.utc)- last_message.timestamp).seconds < 2:
+    (datetime.now(timezone.utc) - last_message.timestamp).total_seconds < 2:
         return # Ignore duplicate within 2 seconds
     
     application = AdoptionApplication.query.get(data['application_id'])
@@ -526,3 +532,19 @@ def delete_application(application_id):
         flash(f"Failed to delete: {str(e)}", "error")
 
     return redirect(url_for('views.applications'))
+#####################################################################
+@views.route('update_application_status/<int:application_id>/<status>')
+@login_required
+def update_application_status(application_id, status):
+    if not current_user.is_admin:
+        abort(403)
+
+    app = AdoptionApplication.query.get_or_404(application_id)
+    if app.pet.posted_by != current_user.id:
+        abort(403)
+
+    if status in ['approved', 'rejected']:
+        app.status = status
+        db.session.commit()
+        flash(f'Application {status}', 'success')
+    return redirect(url_for('views.messages', application_id=application_id))
