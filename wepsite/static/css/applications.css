@@ -1,7 +1,27 @@
 /* Applications page with landing page design */
+    .btn-view { background-color: #007bff; color: white; }
+    .btn-view:hover { background-color: #0056b3; color: white; }
+
+    .btn-delete { background-color: #dc3545; color: white; }
+    .btn-delete:hover { background-color: #c82333; color: white; }
+
+    .btn-history { background-color: #6c757d; color: white; }
+    .btn-history:hover { background-color: #545b62; color: white; }
+
+    .btn-approve { background-color: #28a745; color: white; }
+    .btn-approve:hover { background-color: #218838; color: white; }
+
+    .btn-reject { background-color: #ffc107; color: #212529; }
+    .btn-reject:hover { background-color: #e0a800; color: #212529; }
+
+    .status-pending { background-color: #fff3cd; color: #856404; }
+    .status-approved { background-color: #d1edff; color: #0c5460; }
+    .status-rejected { background-color: #f8d7da; color: #721c24; }
+    .status-archived { background-color: #e2e3e5; color: #383d41; }
+
     .applications-hero {
-        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-        padding: 60px 0 40px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            padding: 60px 0 40px;
         position: relative;
         overflow: hidden;
     }
@@ -289,6 +309,73 @@
         left: 12%;
         animation-delay: 4s;
     }
+
+    .status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-custom {
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85em;
+    transition: all 0.3s ease;
+}
+
+.unread-indicator {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75em;
+    margin-left: 8px;
+}
+
+.pet-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pet-details h6 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.pet-details small {
+    color: #6c757d;
+}
+
+.archived-text {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.success-message {
+    background-color: #d1edff;
+    color: #0c5460;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
 
     @keyframes float {
         0%, 100% {
