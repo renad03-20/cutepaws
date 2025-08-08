@@ -44,6 +44,7 @@ class AdoptionApplication(db.Model):
     application_date = db.Column(db.DateTime, default=func.now())
     answers = db.Column(db.Text)  
     status = db.Column(db.String(20), default='pending')
+    user = db.relationship('User',backref='applications')
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     # is_deleted = db.Column(db.Boolean, default=False)  in case i want to soft delete the application
