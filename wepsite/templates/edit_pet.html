@@ -1,39 +1,116 @@
 {% extends "base.html" %}
+{% block title %}Edit Pet{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/editpet.css') }}">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h2>Edit {{ pet.name }}</h2>
-  <form method="POST" enctype="multipart/form-data">
-    <!-- Reuse fields from add_pet.html -->
-    <div class="mb-3">
-      <label class="form-label">Name</label>
-      <input type="text" class="form-control" name="name" value="{{ pet.name }}" required>
+<!-- Hero Section -->
+<section class="editpet-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <h1 class="hero-title">Edit Pet Information ✏️</h1>
+                    <p class="hero-subtitle">Update {{ pet.name }}'s details to help them find their perfect home</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Age</label>
-      <input type="text" class="form-control" name="age" value="{{ pet.age }}" required>
+</section>
+
+<!-- Main Form Section -->
+<section class="main-section">
+    <div class="container">
+        <!-- Floating decorative elements -->
+        <div class="floating-element">🐱</div>
+        <div class="floating-element">✏️</div>
+        <div class="floating-element">❤️</div>
+        
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="form-container">
+                    <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/house2.png') }}" class="house-decoration" alt="Cat House">
+                    
+                    <h2 class="form-title">Update Pet Information</h2>
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Pet Name</label>
+                            <input type="text" class="form-control" name="name" id="name" value="{{ pet.name }}" placeholder="Enter the pet's name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="age" class="form-label">Pet Age</label>
+                            <input type="text" class="form-control" name="age" id="age" value="{{ pet.age }}" placeholder="e.g., 2 years old, 6 months" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="breed" class="form-label">Pet Breed</label>
+                            <input type="text" class="form-control" name="breed" id="breed" value="{{ pet.breed }}" placeholder="e.g., Persian, Siamese, Mixed" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" name="description" id="description" rows="4" placeholder="Tell us about this pet's personality, habits, and what makes them special..." required>{{ pet.description }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Current Image</label>
+                            <div class="current-image-container">
+                                <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" class="current-image" alt="{{ pet.name }}">
+                                <div class="image-overlay">
+                                    <span class="image-label">Current Photo</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="formFile" class="form-label">Update Image (Optional)</label>
+                            <div class="file-upload-wrapper">
+                                <input class="form-control" type="file" id="formFile" name="image" hidden accept="image/*">
+                                <button type="button" class="file-upload-btn" onclick="document.getElementById('formFile').click();">
+                                    📸 Choose New Photo
+                                </button>
+                                <p class="file-help-text">Leave empty to keep current image</p>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Breed</label>
-      <input type="text" class="form-control" name="breed" value="{{ pet.breed }}" required>
+</section>
+
+<!-- Tips Section -->
+<section class="tips-section">
+    <div class="container">
+        <h2 class="tips-title">Tips for Updating Your Listing</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="tip-card">
+                    <i class="tip-icon">📸</i>
+                    <p class="tip-text">Update photos if the pet's appearance has changed significantly</p>
+                </div>
+                <div class="tip-card">
+                    <i class="tip-icon">📝</i>
+                    <p class="tip-text">Keep the description current with any new behaviors or preferences</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="tip-card">
+                    <i class="tip-icon">💡</i>
+                    <p class="tip-text">Mention any recent socialization progress or training achievements</p>
+                </div>
+                <div class="tip-card">
+                    <i class="tip-icon">🏥</i>
+                    <p class="tip-text">Update medical information if there have been recent vet visits</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Description</label>
-      <textarea class="form-control" name="description" rows="3" required>{{ pet.description }}</textarea>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Current Image</label>
-      <div>
-        <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" class="img-thumbnail" alt="{{ pet.name }}" style="max-width: 200px;">
-      </div>
-    
-    <div class="mb-3">
-      <label class="form-label">Update Image (Optional)</label>
-      <input type="file" class="form-control" name="image">
-    </div>
-    
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-  </form>
-</div>
+</section>
 {% endblock %}
-    
