@@ -445,6 +445,77 @@
     border-color: var(--color-warning) !important;
     color: #000 !important;
 }
+.error-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px 20px;
+    border-radius: 6px;
+    z-index: 1000;
+    display: none;
+}
+
+.success-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #d1edff;
+    color: #0c5460;
+    padding: 12px 20px;
+    border-radius: 6px;
+    z-index: 1000;
+    display: none;
+}
+
+.message-input:invalid {
+    border-color: #dc3545;
+}
+
+.quick-reply-btn:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.typing-indicator {
+    font-style: italic;
+    color: #6c757d;
+    padding: 8px;
+    display: none;
+}
+
+.connection-status {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    z-index: 1000;
+}
+
+.status-connected {
+    background-color: #d1edff;
+    color: #0c5460;
+}
+
+.status-disconnected {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.message-count {
+    font-size: 0.75em;
+    color: #6c757d;
+    text-align: center;
+    margin: 10px 0;
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
