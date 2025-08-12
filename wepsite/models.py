@@ -57,6 +57,8 @@ class AdoptionApplication(db.Model):
 
 
 class Message(db.Model):
+    __tablename__ = 'messages'
+
     id = db.Column(db.Integer, primary_key=True)
     application_id = db.Column(db.Integer, db.ForeignKey('adoption_application.id'))
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -65,4 +67,17 @@ class Message(db.Model):
     is_read = db.Column(db.Boolean, default=False)
     sender = db.relationship('User', foreign_keys=[sender_id])
     is_deleted = db.Column(db.Boolean, default=False)
+    client_id = db.Column(db.String(36), unique=True, nullable=True)  # Client-generated UUID
+    sequence_number = db.Column(db.Integer, nullable=False)  # Sequential ordering within application
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    __table_args__ = (
+        db.Index('idx_messages_app_sequence', 'application_id', 'sequence_number'),
+        db.Index('idx_messages_client_id', 'client_id'),
+        db.Index('idx_messages_unread', 'application_id', 'is_read', 'is_deleted'),
+    )
+
+    # Relationships
+    sender = db.relationship('User', backref=db.backref('sent_messages', lazy='dynamic'))
+    application = db.relationship('AdoptionApplication', backref=db.backref('messages', lazy='dynamic'))
+   
