@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from . import db
 from .models import User, Pet, AdoptionApplication, Message
 from flask_socketio import emit, join_room, disconnect
+import uuid
 from . import socketio
 import os
 import logging
