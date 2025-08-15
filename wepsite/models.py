@@ -50,7 +50,7 @@ class AdoptionApplication(db.Model):
     # is_deleted = db.Column(db.Boolean, default=False)  in case i want to soft delete the application
     messages = db.relationship(
         'Message', 
-        backref='application', 
+        back_populates='application', 
         lazy=True,
         cascade="all, delete-orphan"
     )
@@ -79,5 +79,4 @@ class Message(db.Model):
 
     # Relationships
     sender = db.relationship('User', backref=db.backref('sent_messages', lazy='dynamic'))
-    application = db.relationship('AdoptionApplication', backref=db.backref('messages', lazy='dynamic'))
-   
+    application = db.relationship('AdoptionApplication', back_populates='messages')
