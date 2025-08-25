@@ -38,42 +38,6 @@
                             Available Pets for Adoption
                         {% endif %}
                     </h2>
-
-                    <!-- Pet Photo Grid -->
-                    <div class="pets-grid">
-                        {% for pet in pets %}
-                        <div class="pet-card-wrapper">
-                            <div class="pet-card">
-                                <a href="{{ url_for('views.pet_detail', pet_id=pet.id) }}" class="pet-link">
-                                    {% if pet.is_adopted %}
-                                        <div class="adopted-overlay"></div>
-                                        <div class="adopted-label">ADOPTED ✓</div>
-                                    {% endif %}
-                                    <div class="pet-image-container">
-                                        <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" 
-                                             class="pet-image" 
-                                             alt="{{ pet.name }}">
-                                    </div>
-                                    <div class="pet-info">
-                                        <h3 class="pet-name">{{ pet.name }}</h3>
-                                        <p class="pet-details">{{ pet.breed }} • {{ pet.age }}</p>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    
-                    {% if not pets %}
-                    <div class="no-pets-message">
-                        <div class="no-pets-icon">🐱</div>
-                        <h3>No pets found</h3>
-                        <p>Try selecting a different city or check back later for new arrivals!</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            
             <!-- Right side - Location Filter -->
             <div class="col-md-4">
                 <div class="filter-container">
@@ -137,6 +101,41 @@
                             <span class="stat-label">Available Pets</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+                    <!-- Pet Photo Grid -->
+                    <div class="pets-grid">
+                        {% for pet in pets %}
+                        <div class="pet-card-wrapper">
+                            <div class="pet-card">
+                                <a href="{{ url_for('views.pet_detail', pet_id=pet.id) }}" class="pet-link">
+                                    {% if pet.is_adopted %}
+                                        <div class="adopted-overlay"></div>
+                                        <div class="adopted-label">ADOPTED ✓</div>
+                                    {% endif %}
+                                    <div class="pet-image-container">
+                                        <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" 
+                                             class="pet-image" 
+                                             alt="{{ pet.name }}">
+                                    </div>
+                                    <div class="pet-info">
+                                        <h3 class="pet-name">{{ pet.name }}</h3>
+                                        <p class="pet-details">{{ pet.breed }} • {{ pet.age }}</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if not pets %}
+                    <div class="no-pets-message">
+                        <div class="no-pets-icon">🐱</div>
+                        <h3>No pets found</h3>
+                        <p>Try selecting a different city or check back later for new arrivals!</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
