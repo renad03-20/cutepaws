@@ -26,7 +26,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="hero-content">
-                    <h1 class="hero-title">Chat Messages 💬</h1>
+                    <h1 class="hero-title">Chat Messages</h1>
                     <p class="hero-subtitle">Connect with potential adopters and pet owners</p>
                 </div>
             </div>
@@ -58,19 +58,19 @@
                                             Posted by {{ application.pet.poster.first_name }}
                                         </small>
                                     {% else %}
-                                        <span class="archived-pet">📁 Archived Pet Conversation</span>
+                                        <span class="archived-pet">Archived Pet Conversation</span>
                                     {% endif %}
                                 </h5>
                                 {% if application.pet and application.pet.is_deleted %}
-                                    <small class="unavailable-notice">⚠️ This pet is no longer available</small>
+                                    <small class="unavailable-notice">This pet is no longer available</small>
                                 {% endif %}
                             </div>
                             <div class="status-badge">
                                 <span class="badge status-{{ application.status }}">
-                                    {% if application.status == 'approved' %}✅{% endif %}
-                                    {% if application.status == 'pending' %}⏳{% endif %}
-                                    {% if application.status == 'rejected' %}❌{% endif %}
-                                    {% if application.status == 'archived' %}📁{% endif %}
+                                    {% if application.status == 'approved' %}<i class="fa-regular fa-thumbs-up"></i>{% endif %}
+                                    {% if application.status == 'pending' %}<i class="fa-solid fa-hourglass-half"></i>{% endif %}
+                                    {% if application.status == 'rejected' %}<i class="fa-solid fa-square-xmark"></i>{% endif %}
+                                    {% if application.status == 'archived' %}<i class="fa-solid fa-box-archive"></i>{% endif %}
                                     {{ application.status|title }}
                                 </span>
                             </div>
@@ -80,7 +80,7 @@
                     <!-- Application Details (Admin Only) -->
                     {% if current_user.is_admin and application.answers %}
                     <div class="application-details">
-                        <h6 class="details-title">📋 Application Details</h6>
+                        <h6 class="details-title">Application Details</h6>
                         <div class="details-content">
                             {% set answers = application.answers|from_json %}
                             <div class="details-grid">
@@ -135,7 +135,7 @@
                     <div class="chat-footer">
                         {% if application.status == 'archived' or (application.pet and application.pet.is_deleted) %}
                             <div class="archived-notice">
-                                <i class="archive-icon">📁</i>
+                                <i class="archive-icon fa-solid fa-box-archive"></i>
                                 <span>This application is archived and cannot be modified.</span>
                             </div>
                         {% else %}
@@ -150,7 +150,7 @@
                                            required>
                                     <button type="submit" class="send-btn" id="sendBtn">
                                         <span class="btn-text">Send</span>
-                                        <span class="btn-icon">📤</span>
+                                        <span class="btn-icon"><i class="fa-solid fa-paper-plane"></i></span>
                                     </button>
                                 </div>
                                 
@@ -162,13 +162,13 @@
                                 {% if current_user.is_admin and application.pet.posted_by == current_user.id and application.status == 'pending' %}
                                 <div class="quick-replies">
                                     <button type="button" class="quick-reply-btn approve-btn" data-reply="approved">
-                                        ✅ Approve Application
+                                        Approve Application
                                     </button>
                                     <button type="button" class="quick-reply-btn info-btn" data-reply="questions">
-                                        ❓ Request More Info
+                                        Request More Info
                                     </button>
                                     <button type="button" class="quick-reply-btn reject-btn" data-reply="rejected">
-                                        ❌ Need More Details
+                                        Need More Details
                                     </button>
                                 </div>
                                 {% endif %}

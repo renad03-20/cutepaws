@@ -62,8 +62,8 @@
                                     <tr>
                                         <th>🐾 Pet Information</th>
                                         <th>👤 {{ 'Applicant' if current_user.is_admin else 'Application' }}</th>
-                                        <th>📊 Status</th>
-                                        <th>💬 Messages</th>
+                                        <th><i class="fa-solid fa-signal"></i> Status</th>
+                                        <th> Messages</th>
                                         <th>⚡ Actions</th>
                                     </tr>
                                 </thead>
@@ -97,10 +97,10 @@
                                             </td>
                                             <td>
                                                 <span class="status-badge status-{{ app.status }}">
-                                                    {% if app.status == 'pending' %}⏳{% endif %}
-                                                    {% if app.status == 'approved' %}✅{% endif %}
-                                                    {% if app.status == 'rejected' %}❌{% endif %}
-                                                    {% if app.status == 'archived' %}📁{% endif %}
+                                                    {% if app.status == 'pending' %}<i class="fa-regular fa-thumbs-up"></i>{% endif %}
+                                                    {% if app.status == 'approved' %}<i class="fa-solid fa-hourglass-half"></i>{% endif %}
+                                                    {% if app.status == 'rejected' %}<i class="fa-solid fa-square-xmark"></i>{% endif %}
+                                                    {% if app.status == 'archived' %}<i class="fa-solid fa-box-archive"></i>{% endif %}
                                                     {{ app.status|title }}
                                                 </span>
                                             </td>
@@ -115,7 +115,7 @@
                                                 <div class="action-buttons">
                                                     <!-- View Messages Button -->
                                                     <a href="{{ url_for('views.messages', application_id=app.id) }}" class="btn-custom btn-view">
-                                                        💬 Messages
+                                                        💬 
                                                         {% if app.unread and app.unread > 0 %}
                                                             <span class="unread-indicator">{{ app.unread }}</span>
                                                         {% endif %}
@@ -143,7 +143,7 @@
                                                             <a href="{{ url_for('views.delete_application', application_id=app.id) }}" 
                                                                class="btn-custom btn-delete" 
                                                                onclick="return confirm('Are you sure you want to delete this application? This action cannot be undone.')">
-                                                                🗑️ Delete
+                                                                🗑️
                                                             </a>
                                                         {% endif %}
                                                     {% else %}
