@@ -44,7 +44,57 @@
     min-height: 70vh;
     position: relative;
 }
+/* Ensure proper column behavior */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
 
+.col-md-8, .col-md-4 {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+@media (min-width: 768px) {
+    .col-md-8 {
+        flex: 0 0 66.666667%;
+        max-width: 66.666667%;
+    }
+    
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+
+/* Make filter container sticky */
+.filter-container {
+    position: sticky;
+    top: 20px;
+}
+/* Responsive adjustments for the filter */
+@media (max-width: 768px) {
+    .filter-container {
+        margin-top: 1rem;
+    }
+    
+    .filter-container .input-group {
+        flex-direction: column;
+    }
+    
+    .filter-container .location-select {
+        border-radius: 15px 15px 0 0 !important;
+        border-right: 2px solid var(--color-border) !important;
+        border-bottom: none !important;
+    }
+    
+    .filter-container .search-btn {
+        border-radius: 0 0 15px 15px !important;
+        width: 100% !important;
+    }
+}
 /* Floating decorative elements */
 .floating-element {
     position: absolute;
