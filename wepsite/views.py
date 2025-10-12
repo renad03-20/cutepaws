@@ -483,7 +483,7 @@ def handle_send_message(data):
                     'sender': current_user.first_name,
                     'sender_id': current_user.id,
                     'content': content,
-                    'timestamp': new_message.timestamp.strftime('%b %d, %I:%M %p'),
+                    'timestamp': (new_message.timestamp or datetime.now(timezone.utc)).strftime('%b %d, %I:%M %p'),
                     'sequence_number': new_message.sequence_number,
                     'is_read': False
                 }
