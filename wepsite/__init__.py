@@ -8,14 +8,20 @@ from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
-from apscheduler.schedulers.background import BackgroundScheduler 
+from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta, timezone
 from flask import Flask
 import json
 
-socketio = SocketIO() 
+# =================================================================
+# FIX: Added cors_allowed_origins='*' for development environment.
+# This ensures that the WebSocket connection can be established
+# even if the client and server are on different ports (e.g., in a
+# development setup).
+# =================================================================
+socketio = SocketIO(cors_allowed_origins="*")
 db = SQLAlchemy()
-migrate = Migrate() 
+migrate = Migrate()
 DB_NAME = 'database.db'
 load_dotenv()
 
@@ -33,7 +39,7 @@ def create_admin():
     if user:
         print('User already exists')
         return
-    
+
     new_user = User(
         email=email,
         password=generate_password_hash(password, method='pbkdf2:sha256'),
@@ -53,7 +59,7 @@ def delete_old_adoptions(app):
     with app.app_context():
         from .models import Pet, AdoptionApplication
         from datetime import datetime, timedelta, timezone
-        
+
         expired_pets = Pet.query.filter(
             Pet.is_adopted == True,
             Pet.adoption_date <= datetime.now(timezone.utc) - timedelta(days=2),
@@ -62,7 +68,7 @@ def delete_old_adoptions(app):
 
         for pet in expired_pets:
             try:
-                #soft delete pet 
+                #soft delete pet
                 pet.is_deleted = True
 
                 AdoptionApplication.query.filter_by(pet_id=pet.id).update(
@@ -73,7 +79,7 @@ def delete_old_adoptions(app):
             except Exception as e:
                 db.session.rollback()
                 print(f"❌ Error archiving pet {pet.id}: {str(e)}")
-        
+
 
 def create_app():
     app = Flask(__name__)
@@ -105,10 +111,9 @@ def create_app():
         print("⏰ Scheduler started: Pet cleanup job active")#for testing
 
     db.init_app(app)
-    migrate.init_app(app, db) 
+    migrate.init_app(app, db)
 
     socketio.init_app(app) # Initialize SocketIO
-
 
 
     from .views import views
