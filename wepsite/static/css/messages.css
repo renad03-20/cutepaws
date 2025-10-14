@@ -140,7 +140,7 @@
 }
 
 .unavailable-notice {
-    color: #ffeb3b;
+    color: var(--color-warning);
     font-weight: 500;
 }
 
@@ -159,12 +159,12 @@
 }
 
 .status-pending {
-    background-color: var(--color-warning) !important;
-    color: #000;
+    background-color: var(--color-secondary) !important;
+    color: var(--color-text);
 }
 
 .status-archived {
-    background-color: var(--color-text-muted) !important;
+    background-color: var(--color-text-light) !important;
     color: white;
 }
 
@@ -322,7 +322,7 @@
 }
 
 .read-icon.read {
-    color: #4caf50;
+    color: var(--color-success);
 }
 
 .read-icon.delivered {
@@ -441,16 +441,17 @@
 }
 
 .info-btn:hover {
-    background-color: var(--color-warning) !important;
-    border-color: var(--color-warning) !important;
-    color: #000 !important;
+    background-color: var(--color-secondary) !important;
+    border-color: var(--color-secondary) !important;
+    color: var(--color-text) !important;
 }
+
 .error-toast {
     position: fixed;
     top: 20px;
     right: 20px;
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: var(--color-error);
+    color: white;
     padding: 12px 20px;
     border-radius: 6px;
     z-index: 1000;
@@ -461,8 +462,8 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    background-color: #d1edff;
-    color: #0c5460;
+    background-color: var(--color-primary);
+    color: white;
     padding: 12px 20px;
     border-radius: 6px;
     z-index: 1000;
@@ -470,7 +471,7 @@
 }
 
 .message-input:invalid {
-    border-color: #dc3545;
+    border-color: var(--color-danger);
 }
 
 .quick-reply-btn:hover {
@@ -485,7 +486,7 @@
 
 .typing-indicator {
     font-style: italic;
-    color: #6c757d;
+    color: var(--color-text-light);
     padding: 8px;
     display: none;
 }
@@ -501,18 +502,18 @@
 }
 
 .status-connected {
-    background-color: #d1edff;
-    color: #0c5460;
+    background-color: var(--color-primary);
+    color: white;
 }
 
 .status-disconnected {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: var(--color-error);
+    color: white;
 }
 
 .message-count {
     font-size: 0.75em;
-    color: #6c757d;
+    color: var(--color-text-light);
     text-align: center;
     margin: 10px 0;
 }
@@ -537,7 +538,7 @@
 }
 
 .message-failed {
-    border: 1px solid #dc3545;
+    border: 1px solid var(--color-danger);
     background-color: rgba(220, 53, 69, 0.1);
 }
 
@@ -546,7 +547,7 @@
 }
 
 .message-error {
-    color: #dc3545;
+    color: var(--color-danger);
     font-size: 0.8rem;
     margin-top: 5px;
     cursor: pointer;
@@ -558,20 +559,20 @@
 
 /* Read status icons */
 .read-icon.sending {
-    color: #ffc107;
+    color: var(--color-secondary);
     animation: pulse 1s infinite;
 }
 
 .read-icon.delivered {
-    color: #6c757d;
+    color: var(--color-text-light);
 }
 
 .read-icon.read {
-    color: #28a745;
+    color: var(--color-success);
 }
 
 .read-icon.failed {
-    color: #dc3545;
+    color: var(--color-danger);
     cursor: pointer;
 }
 
@@ -590,12 +591,12 @@
 }
 
 .status-connected {
-    background-color: #28a745;
+    background-color: var(--color-success);
     box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
 }
 
 .status-disconnected {
-    background-color: #dc3545;
+    background-color: var(--color-danger);
     box-shadow: 0 2px 10px rgba(220, 53, 69, 0.3);
 }
 
@@ -615,12 +616,12 @@
 }
 
 .error-toast {
-    background-color: #dc3545;
+    background-color: var(--color-danger);
     box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
 .success-toast {
-    background-color: #28a745;
+    background-color: var(--color-success);
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
@@ -667,7 +668,7 @@
     position: absolute;
     top: -10px;
     right: -10px;
-    background: #007bff;
+    background: var(--color-primary);
     color: white;
     font-size: 10px;
     padding: 2px 4px;
