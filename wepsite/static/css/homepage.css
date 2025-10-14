@@ -216,7 +216,7 @@
 
 .pet-details {
     font-size: 0.9rem;
-    color: var(--color-text-muted);
+    color: var(--color-text-light);
     margin: 0;
 }
 
@@ -270,7 +270,7 @@
 }
 
 .no-pets-message p {
-    color: var(--color-text-muted);
+    color: var(--color-text-light);
     margin: 0;
 }
 
@@ -387,7 +387,7 @@
 
 .stat-label {
     font-size: 0.9rem;
-    color: var(--color-text-muted);
+    color: var(--color-text-light);
     margin-top: 0.2rem;
 }
 
