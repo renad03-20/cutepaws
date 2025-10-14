@@ -1,281 +1,281 @@
-    /* Add Pet page with landing page design */
-    .addpet-hero {
-        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-        padding: 80px 0 60px;
-        position: relative;
-        overflow: hidden;
-    }
+/* Add Pet page with landing page design */
+.addpet-hero {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    padding: 80px 0 60px;
+    position: relative;
+    overflow: hidden;
+}
 
-    .addpet-hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.1);
-        z-index: 1;
-    }
+.addpet-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
 
-    .hero-content {
-        position: relative;
-        z-index: 2;
-        color: white;
-        text-align: center;
-    }
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+}
 
+.hero-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    font-family: 'Playwrite AU NSW', cursive;
+    opacity: 0.95;
+    margin-bottom: 0;
+}
+
+.main-section {
+    padding: 80px 0;
+    background-color: var(--color-background);
+    min-height: 70vh;
+    position: relative;
+}
+
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: var(--color-surface);
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border);
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.form-container:hover {
+    transform: translateY(-5px);
+}
+
+.house-decoration {
+    position: absolute;
+    top: -40px;
+    right: -20px;
+    max-width: 200px;
+    opacity: 0.7;
+    z-index: 1;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.form-title {
+    text-align: center;
+    font-size: 2.2rem;
+    color: var(--color-primary);
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: var(--color-text);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 1.1rem;
+}
+
+.form-control {
+    background-color: var(--color-background) !important;
+    border: 2px solid var(--color-border) !important;
+    color: var(--color-text) !important;
+    border-radius: 15px !important;
+    padding: 12px 20px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    box-sizing: border-box;
+}
+
+.form-control:hover {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 10px rgba(93, 156, 236, 0.2) !important;
+    background-color: var(--color-surface) !important;
+}
+
+.form-control:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(93, 156, 236, 0.25) !important;
+    background-color: var(--color-surface) !important;
+    outline: none !important;
+}
+
+.form-control select {
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+}
+
+textarea.form-control {
+    min-height: 100px !important;
+    resize: vertical;
+}
+
+.file-upload-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.file-upload-btn {
+    background-color: var(--color-secondary) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 25px !important;
+    border-radius: 25px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    justify-content: center !important;
+}
+
+.file-upload-btn:hover {
+    background-color: var(--color-secondary-dark) !important;
+    transform: translateY(-2px) !important;
+}
+
+.submit-btn {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 40px !important;
+    border-radius: 25px !important;
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+    margin-top: 1rem !important;
+}
+
+.submit-btn:hover {
+    background-color: var(--color-primary-dark) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Floating decorative elements */
+.floating-element {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.1;
+    animation: float 6s ease-in-out infinite;
+    user-select: none;
+    pointer-events: none;
+}
+
+.floating-element:nth-child(1) {
+    top: 20%;
+    left: 5%;
+    animation-delay: 0s;
+}
+
+.floating-element:nth-child(2) {
+    bottom: 30%;
+    right: 8%;
+    animation-delay: 2s;
+}
+
+.floating-element:nth-child(3) {
+    top: 60%;
+    left: 10%;
+    animation-delay: 4s;
+}
+
+/* Tips section */
+.tips-section {
+    background-color: var(--color-surface);
+    padding: 60px 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.tips-title {
+    text-align: center;
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.tip-card {
+    background-color: var(--color-background);
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-border);
+    transition: transform 0.3s ease;
+}
+
+.tip-card:hover {
+    transform: translateX(10px);
+}
+
+.tip-icon {
+    color: var(--color-secondary);
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+.tip-text {
+    color: var(--color-text);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
     .hero-title {
-        font-size: 3rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-size: 2.2rem;
     }
-
+    
     .hero-subtitle {
-        font-size: 1.2rem;
-        font-family: 'Playwrite AU NSW', cursive;
-        opacity: 0.95;
-        margin-bottom: 0;
+        font-size: 1rem;
     }
-
-    .main-section {
-        padding: 80px 0;
-        background-color: var(--color-background);
-        min-height: 70vh;
-        position: relative;
-    }
-
+    
     .form-container {
-        max-width: 600px;
-        margin: 0 auto;
-        background-color: var(--color-surface);
-        padding: 50px 40px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--color-border);
-        position: relative;
-        transition: transform 0.3s ease;
+        margin: 0 20px;
+        padding: 30px 25px;
     }
-
-    .form-container:hover {
-        transform: translateY(-5px);
-    }
-
+    
     .house-decoration {
-        position: absolute;
-        top: -40px;
-        right: -20px;
-        max-width: 200px;
-        opacity: 0.7;
-        z-index: 1;
-        animation: float 6s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-15px);
-        }
+        display: none;
     }
 
     .form-title {
-        text-align: center;
-        font-size: 2.2rem;
-        color: var(--color-primary);
-        margin-bottom: 2rem;
-        font-weight: 600;
+        font-size: 1.8rem;
     }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
+    
     .form-label {
-        color: var(--color-text);
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        display: block;
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
-
-    .form-control {
-        background-color: var(--color-background) !important;
-        border: 2px solid var(--color-border) !important;
-        color: var(--color-text) !important;
-        border-radius: 15px !important;
-        padding: 12px 20px !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-        width: 100% !important;
-        max-width: none !important;
-        height: auto !important;
-        box-sizing: border-box;
-    }
-
-    .form-control:hover {
-        border-color: var(--color-primary) !important;
-        box-shadow: 0 0 10px rgba(93, 156, 236, 0.2) !important;
-        background-color: var(--color-surface) !important;
-    }
-
-    .form-control:focus {
-        border-color: var(--color-primary) !important;
-        box-shadow: 0 0 0 0.2rem rgba(93, 156, 236, 0.25) !important;
-        background-color: var(--color-surface) !important;
-        outline: none !important;
-    }
-
-    .form-control select {
-        background-color: var(--color-background) !important;
-        color: var(--color-text) !important;
-    }
-
-    textarea.form-control {
-        min-height: 100px !important;
-        resize: vertical;
-    }
-
-    .file-upload-wrapper {
-        position: relative;
-        display: inline-block;
-        width: 100%;
-    }
-
-    .file-upload-btn {
-        background-color: var(--color-secondary) !important;
-        color: white !important;
-        border: none !important;
-        padding: 12px 25px !important;
-        border-radius: 25px !important;
-        font-size: 1rem !important;
-        font-weight: 500 !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        width: 100% !important;
-        justify-content: center !important;
-    }
-
-    .file-upload-btn:hover {
-        background-color: var(--color-secondary-dark) !important;
-        transform: translateY(-2px) !important;
-    }
-
-    .submit-btn {
-        background-color: var(--color-primary) !important;
-        color: white !important;
-        border: none !important;
-        padding: 15px 40px !important;
-        border-radius: 25px !important;
-        font-size: 1.1rem !important;
-        font-weight: 500 !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-        width: 100% !important;
-        margin-top: 1rem !important;
-    }
-
-    .submit-btn:hover {
-        background-color: var(--color-primary-dark) !important;
-        transform: translateY(-2px) !important;
-    }
-
-    /* Floating decorative elements */
-    .floating-element {
-        position: absolute;
-        font-size: 2rem;
-        opacity: 0.1;
-        animation: float 6s ease-in-out infinite;
-        user-select: none;
-        pointer-events: none;
-    }
-
-    .floating-element:nth-child(1) {
-        top: 20%;
-        left: 5%;
-        animation-delay: 0s;
-    }
-
-    .floating-element:nth-child(2) {
-        bottom: 30%;
-        right: 8%;
-        animation-delay: 2s;
-    }
-
-    .floating-element:nth-child(3) {
-        top: 60%;
-        left: 10%;
-        animation-delay: 4s;
-    }
-
-    /* Tips section */
-    .tips-section {
-        background-color: var(--color-surface);
-        padding: 60px 0;
-        border-top: 1px solid var(--color-border);
-    }
-
-    .tips-title {
-        text-align: center;
-        font-size: 2rem;
-        color: var(--color-primary);
-        margin-bottom: 2rem;
-        font-weight: 600;
-    }
-
-    .tip-card {
-        background-color: var(--color-background);
-        padding: 25px;
-        border-radius: 15px;
-        margin-bottom: 1.5rem;
-        border: 1px solid var(--color-border);
-        transition: transform 0.3s ease;
-    }
-
-    .tip-card:hover {
-        transform: translateX(10px);
-    }
-
-    .tip-icon {
-        color: var(--color-secondary);
-        font-size: 1.5rem;
-        margin-right: 15px;
-    }
-
-    .tip-text {
-        color: var(--color-text);
-        margin: 0;
-        font-weight: 500;
-    }
-
-    /* Responsive design */
-    @media (max-width: 768px) {
-        .hero-title {
-            font-size: 2.2rem;
-        }
-        
-        .hero-subtitle {
-            font-size: 1rem;
-        }
-        
-        .form-container {
-            margin: 0 20px;
-            padding: 30px 25px;
-        }
-        
-        .house-decoration {
-            display: none;
-        }
-
-        .form-title {
-            font-size: 1.8rem;
-        }
-        
-        .form-label {
-            font-size: 1rem;
-        }
-    }
+}
