@@ -159,19 +159,6 @@
                                     <span id="charCount">0</span>/1000
                                 </div>
 
-                                {% if current_user.is_admin and application.pet.posted_by == current_user.id and application.status == 'pending' %}
-                                <div class="quick-replies">
-                                    <button type="button" class="quick-reply-btn approve-btn" data-reply="approved">
-                                        Approve Application
-                                    </button>
-                                    <button type="button" class="quick-reply-btn info-btn" data-reply="questions">
-                                        Request More Info
-                                    </button>
-                                    <button type="button" class="quick-reply-btn reject-btn" data-reply="rejected">
-                                        Need More Details
-                                    </button>
-                                </div>
-                                {% endif %}
                             </form>
                         {% endif %}
                     </div>
@@ -184,12 +171,11 @@
 
 {% block scripts %}
 <script>
-    // Add these variables before loading the external JS file
-    const messageCount = {{ messages|length }};
-    const currentSequence = {{ messages[-1].sequence_number if messages else 0 }};
-    const currentUserId = {{ current_user.id }};
-    const currentUserName = '{{ current_user.first_name }}';
-    const applicationId = '{{ application.id }}';
+    var messageCount = {{ messages|length }};
+    var currentSequence = {{ messages[-1].sequence_number if messages else 0 }};
+    var currentUserId = {{ current_user.id }};
+    var currentUserName = '{{ current_user.first_name }}';
+    var applicationId = '{{ application.id }}';
 </script>
 <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
 {% endblock%}
