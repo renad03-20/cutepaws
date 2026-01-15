@@ -1,18 +1,34 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    const currentUserId = window.currentUserId;
+    const currentUserName = window.currentUserName;
+    const applicationId = window.applicationId;
+
     const messageContainer = document.getElementById('messagesContainer');
     const messageInput = document.querySelector('input[name="message"]');
     const sendBtn = document.getElementById('sendBtn');
     const charCount = document.getElementById('charCount');
-    const messageCount = document.getElementById('messageCount');
+    const messageCountEl = document.getElementById('messageCount');
     const connectionStatus = document.getElementById('connectionStatus');
     
+    // Initial state setup
     let messageCounter = window.messageCount || 0;
     let currentSequence = window.currentSequence || 0;
     let pendingMessages = new Map(); // Track messages being sent
     let usePolling = false;
     let pollingInterval;
+    let isUserAtBottom = true;
     
-    // Generate client ID for messages
+    // Track scroll position to determine if user is at bottom
+    if (messageContainer) {
+        messageContainer.addEventListener('scroll', () => {
+            const threshold = 50; // pixels from bottom
+            isUserAtBottom = messageContainer.scrollHeight - messageContainer.scrollTop - messageContainer.clientHeight <= threshold;
+        });
+    }
+
+    // --- Helper Functions ---
+
     function generateClientId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }
@@ -26,16 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Smart scroll that doesn't cause page jumps
     function scrollToBottom() {
         if (messageContainer) {
-            // Check if user was near bottom before scrolling
-            const isNearBottom = messageContainer.scrollTop + messageContainer.clientHeight >= messageContainer.scrollHeight - 50;
-            
-            if (isNearBottom) {
-                // Use smooth scroll to prevent jarring jumps
-                messageContainer.scrollTo({
-                    top: messageContainer.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }
+            // Use smooth scroll to prevent jarring jumps
+            messageContainer.scrollTo({
+                top: messageContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     }
 
@@ -48,8 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const userId = window.currentUserId || 0;
-        const messageClass = messageData.sender_id === userId ? 'message-sent' : 'message-received';
+        const messageClass = messageData.sender_id === currentUserId ? 'message-sent' : 'message-received';
         const statusClass = status === 'sending' ? 'message-sending' : '';
         
         const messageHtml = `
@@ -62,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="message-header">
                             <span class="sender-name">${messageData.sender}</span>
                             <span class="message-time">${messageData.timestamp}</span>
-                            ${messageData.sender_id === userId ? `
+                            ${messageData.sender_id === currentUserId ? `
                                 <span class="read-status">
                                     <i class="read-icon ${status === 'sending' ? 'sending' : 'delivered'}" 
                                        title="${status === 'sending' ? 'Sending...' : 'Delivered'}">
@@ -79,12 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         messageContainer.insertAdjacentHTML('beforeend', messageHtml);
         
-        // Only scroll if this is user's own message or they were at bottom
-        const wasAtBottom = messageContainer.scrollTop + messageContainer.clientHeight >= messageContainer.scrollHeight - 100;
-        const isOwnMessage = messageData.sender_id === userId;
-        
-        if (isOwnMessage || wasAtBottom) {
-            // Small delay to ensure DOM is updated
+        // Only scroll if user was at bottom or this is their own message
+        if (isUserAtBottom || messageData.sender_id === currentUserId) {
             setTimeout(() => {
                 scrollToBottom();
             }, 10);
@@ -105,7 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const readIcon = element.querySelector('.read-icon');
         const messageError = element.querySelector('.message-error');
         
-        // Remove any existing error messages
         if (messageError) messageError.remove();
         
         element.classList.remove('message-sending', 'message-failed');
@@ -144,8 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateMessageCount() {
-        if (messageCount) {
-            messageCount.textContent = `${messageCounter} message${messageCounter !== 1 ? 's' : ''}`;
+        if (messageCountEl) {
+            messageCountEl.textContent = `${messageCounter} message${messageCounter !== 1 ? 's' : ''}`;
         }
     }
 
@@ -176,11 +181,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Polling fallback function with better error handling
+    // Polling fallback function
     function pollForMessages() {
         if (!usePolling) return;
         
-        fetch(window.location.href + '?poll=1', {
+        const pollUrl = new URL(window.location.href);
+        pollUrl.searchParams.set('poll', '1');
+        
+        fetch(pollUrl, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
@@ -193,13 +201,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (newContainer) {
                     const newMessages = Array.from(newContainer.querySelectorAll('.message-wrapper'));
-                    const existingMessages = Array.from(messageContainer.querySelectorAll('.message-wrapper'));
                     
-                    // Only add truly new messages
                     newMessages.forEach(newMsg => {
                         const clientId = newMsg.dataset.clientId;
                         const sequence = parseInt(newMsg.dataset.sequence);
                         
+                        // Check if message is truly new and hasn't been added optimistically
                         if (!messageContainer.querySelector(`[data-client-id="${clientId}"]`) && sequence > currentSequence) {
                             messageContainer.appendChild(newMsg.cloneNode(true));
                             messageCounter++;
@@ -208,13 +215,326 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     updateMessageCount();
-                    scrollToBottom();
+                    
+                    // Only scroll to bottom if user was at bottom
+                    if (isUserAtBottom) {
+                        scrollToBottom();
+                    }
                 }
             })
             .catch(err => {
                 console.log('Polling failed:', err);
             });
     }
+    
+    // -----------------------------------------------------------------
+    // EXPORTING HELPERS TO WINDOW SCOPE
+    // -----------------------------------------------------------------
+    window.addMessageToDOM = addMessageToDOM;
+    window.updateMessageStatus = updateMessageStatus;
+    window.generateClientId = generateClientId;
+    window.pendingMessages = pendingMessages;
+    window.pollForMessages = pollForMessages;
+    window.currentSequence = currentSequence;
+    window.pollingInterval = pollingInterval;
+    window.usePolling = usePolling;
+
+    // --- Socket.IO Implementation ---
+
+    let socket;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+
+    function initializeSocket() {
+        try {
+            socket = io({
+                transports: ['websocket', 'polling'],
+                timeout: 10000,
+                reconnection: true,
+                reconnectionAttempts: maxReconnectAttempts,
+                reconnectionDelay: 1000
+            });
+
+            // Connection handlers
+            socket.on('connect', () => {
+                console.log('Socket.IO: Connected to server');
+                updateConnectionStatus(true);
+                reconnectAttempts = 0;
+                
+                // Disable manual polling when Socket.IO is working
+                window.usePolling = false;
+                if (window.pollingInterval) {
+                    clearInterval(window.pollingInterval);
+                    window.pollingInterval = null;
+                }
+                
+                // CRITICAL: Join the application room immediately after connection
+                socket.emit('join_room', { application_id: applicationId });
+                console.log('Socket.IO: Joined room for application', applicationId);
+                
+                // Request synchronization
+                socket.emit('sync_messages', {
+                    application_id: applicationId,
+                    last_sequence: window.currentSequence
+                });
+            });
+
+            socket.on('room_joined', (data) => {
+                console.log('Socket.IO: Successfully joined room:', data.room);
+            });
+
+            socket.on('disconnect', (reason) => {
+                console.log('Socket.IO: Disconnected:', reason);
+                updateConnectionStatus(false);
+                
+                // Re-enable polling as fallback
+                window.usePolling = true;
+                if (!window.pollingInterval) {
+                    window.pollingInterval = setInterval(window.pollForMessages, 5000);
+                }
+            });
+
+            socket.on('connect_error', (error) => {
+                console.log('Socket.IO: Connection error:', error);
+                reconnectAttempts++;
+                if (reconnectAttempts >= maxReconnectAttempts) {
+                    showToast('Connection failed. Using fallback mode.', 'error');
+                    window.usePolling = true;
+                    if (!window.pollingInterval) {
+                        window.pollingInterval = setInterval(window.pollForMessages, 5000);
+                    }
+                }
+            });
+
+            // Synchronization handler
+            socket.on('sync_response', (data) => {
+                console.log('Socket.IO: Received sync response with', data.missed_messages.length, 'missed messages');
+                data.missed_messages.forEach(messageData => {
+                    window.addMessageToDOM(messageData, 'sent');
+                });
+                
+                if (data.current_sequence) {
+                    window.currentSequence = data.current_sequence;
+                }
+            });
+
+            // Message handlers - CRITICAL: Handle incoming messages properly
+            socket.on('new_message', (data) => {
+                console.log('Socket.IO: Received new message:', data);
+                
+                const existingMessage = messageContainer.querySelector(`[data-client-id="${data.client_id}"]`);
+                
+                if (!existingMessage) {
+                    window.addMessageToDOM(data, 'sent');
+                    
+                    // Keep input focused if user was typing
+                    if (messageInput && document.activeElement === messageInput) {
+                        setTimeout(() => messageInput.focus(), 50);
+                    }
+                    
+                    // Show notification for received messages (not your own)
+                    if (data.sender_id !== currentUserId) {
+                        showToast(`New message from ${data.sender}`, 'success');
+                    }
+                }
+            });
+
+            socket.on('message_confirmed', (data) => {
+                console.log('Socket.IO: Message confirmed:', data);
+                if (window.pendingMessages.has(data.client_id)) {
+                    const element = messageContainer.querySelector(`[data-client-id="${data.client_id}"]`);
+                    if (element) {
+                        window.updateMessageStatus(element, 'sent', data);
+                    }
+                    window.pendingMessages.delete(data.client_id);
+                }
+            });
+
+            socket.on('message_failed', (data) => {
+                console.log('Socket.IO: Message failed:', data);
+                if (data.client_id) {
+                    const element = messageContainer.querySelector(`[data-client-id="${data.client_id}"]`);
+                    if (element) {
+                        window.updateMessageStatus(element, 'failed');
+                        element.addEventListener('click', () => {
+                            retryMessage(data.client_id, element);
+                        }, { once: true });
+                    }
+                    window.pendingMessages.delete(data.client_id);
+                }
+                
+                showToast(data.error || 'Failed to send message', 'error');
+                if (sendBtn && messageInput) {
+                    sendBtn.disabled = false;
+                    messageInput.focus();
+                }
+            });
+
+            socket.on('error', (data) => {
+                console.log('Socket.IO: Error:', data);
+                showToast(data.message || 'An error occurred', 'error');
+                if (sendBtn) sendBtn.disabled = false;
+            });
+
+            // Retry failed message logic
+            function retryMessage(clientId, element) {
+                const content = element.querySelector('.message-content').textContent;
+                const newClientId = window.generateClientId();
+                
+                element.dataset.clientId = newClientId;
+                window.updateMessageStatus(element, 'sending');
+                
+                socket.emit('send_message', {
+                    application_id: applicationId,
+                    content: content,
+                    client_id: newClientId
+                });
+                
+                window.pendingMessages.set(newClientId, {
+                    content: content,
+                    timestamp: new Date()
+                });
+            }
+
+            // Send message with proper UX handling
+            const messageForm = document.getElementById('message-form');
+            if (messageForm) {
+                messageForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    if (!messageInput || !sendBtn) return;
+                    
+                    const content = messageInput.value.trim();
+                    if (!content) return;
+
+                    if (content.length > 1000) {
+                        showToast('Message too long (max 1000 characters)', 'error');
+                        messageInput.focus();
+                        return;
+                    }
+
+                    const clientId = window.generateClientId();
+                    
+                    // Show optimistic UI immediately
+                    const messageData = {
+                        client_id: clientId,
+                        sender: currentUserName || 'You',
+                        sender_id: currentUserId,
+                        content: content,
+                        timestamp: new Date().toLocaleString('en-US', {
+                            month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true
+                        }),
+                        sequence_number: window.currentSequence + 1
+                    };
+                    
+                    window.addMessageToDOM(messageData, 'sending');
+                    
+                    // Clear input immediately but maintain focus
+                    messageInput.value = '';
+                    if (charCount) charCount.textContent = '0';
+                    messageInput.focus();
+                    
+                    // Disable send button temporarily
+                    sendBtn.disabled = true;
+                    
+                    if (socket && socket.connected) {
+                        // Send via Socket.IO
+                        socket.emit('send_message', {
+                            application_id: applicationId,
+                            content: content,
+                            client_id: clientId
+                        });
+                        
+                        // Track pending message
+                        window.pendingMessages.set(clientId, {
+                            content: content,
+                            timestamp: new Date()
+                        });
+                        
+                        // Re-enable button after short delay
+                        setTimeout(() => {
+                            if (sendBtn) {
+                                sendBtn.disabled = false;
+                                messageInput.focus();
+                            }
+                        }, 500);
+                    } else {
+                        // HTTP Fallback (AJAX) - NO PAGE RELOAD
+                        const formData = new FormData();
+                        formData.append('message', content);
+                        formData.append('client_id', clientId);
+                        
+                        // Get form_id if it exists
+                        const formIdInput = document.querySelector('input[name="form_id"]');
+                        if (formIdInput) {
+                            formData.append('form_id', formIdInput.value);
+                        }
+                        
+                        fetch(messageForm.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            }
+                            throw new Error('HTTP send failed');
+                        })
+                        .then(data => {
+                            // Message sent successfully via HTTP
+                            const element = messageContainer.querySelector(`[data-client-id="${clientId}"]`);
+                            if (element) {
+                                window.updateMessageStatus(element, 'sent');
+                            }
+                            showToast('Message sent via fallback', 'success');
+                        })
+                        .catch(error => {
+                            console.error('HTTP fallback failed:', error);
+                            const element = messageContainer.querySelector(`[data-client-id="${clientId}"]`);
+                            if (element) {
+                                window.updateMessageStatus(element, 'failed');
+                            }
+                            showToast('Failed to send message', 'error');
+                        })
+                        .finally(() => {
+                            sendBtn.disabled = false;
+                            messageInput.focus();
+                        });
+                    }
+                });
+            }
+
+        } catch (e) {
+            console.error("Socket.IO initialization failed:", e);
+            showToast("Using fallback messaging mode", "error");
+            updateConnectionStatus(false);
+            window.usePolling = true;
+        }
+    }
+
+    // --- Initial Setup ---
+    
+    // Initial scroll and setup
+    scrollToBottom();
+    currentSequence = getLastSequence();
+    
+    // Auto-focus input when page loads
+    if (messageInput) {
+        setTimeout(() => {
+            messageInput.focus();
+            console.log('Auto-focused message input');
+        }, 500);
+    }
+
+    // Start polling by default, will be disabled if Socket.IO connects
+    window.usePolling = true;
+    window.pollingInterval = setInterval(pollForMessages, 5000);
+    
+    // Initialize socket connection
+    initializeSocket();
 
     // Character counter
     if (messageInput && charCount) {
@@ -236,395 +556,60 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.history.replaceState && window.location.search) {
         window.history.replaceState(null, null, window.location.pathname);
     }
-
-    // Initial scroll and setup
-    scrollToBottom();
-    currentSequence = getLastSequence();
     
-    // Auto-focus input when page loads
-    if (messageInput) {
-        setTimeout(() => messageInput.focus(), 500);
-    }
-    
-    // Start polling by default, will be disabled if Socket.IO connects
-    usePolling = true;
-    pollingInterval = setInterval(pollForMessages, 5000);
-});
-
-// Socket.IO implementation 
-let socket;
-let reconnectAttempts = 0;
-const maxReconnectAttempts = 5;
-
-function initializeSocket() {
-    try {
-        socket = io({
-            transports: ['websocket', 'polling'],
-            timeout: 5000,
-            reconnection: true,
-            reconnectionAttempts: maxReconnectAttempts,
-            reconnectionDelay: 1000
-        });
-
-        const applicationId = window.applicationId || '';
-        const userId = window.currentUserId || 0;
-        const messageContainer = document.getElementById('messagesContainer');
-        const messageInput = document.querySelector('input[name="message"]');
-        const sendBtn = document.getElementById('sendBtn');
-
-        // Connection handlers
-        socket.on('connect', () => {
-            console.log('Connected to server');
-            updateConnectionStatus(true);
-            reconnectAttempts = 0;
-            
-            // Disable polling when Socket.IO is working
-            window.usePolling = false;
-            if (window.pollingInterval) {
-                clearInterval(window.pollingInterval);
-                window.pollingInterval = null;
-            }
-            
-            // Join the application room
-            socket.emit('join_room', { application_id: applicationId });
-            
-            // Request synchronization
-            socket.emit('sync_messages', {
-                application_id: applicationId,
-                last_sequence: window.currentSequence
-            });
-        });
-
-        socket.on('disconnect', (reason) => {
-            console.log('Disconnected:', reason);
-            updateConnectionStatus(false);
-            
-            // Re-enable polling as fallback
-            window.usePolling = true;
-            if (!window.pollingInterval) {
-                window.pollingInterval = setInterval(window.pollForMessages, 5000);
-            }
-        });
-
-        socket.on('connect_error', (error) => {
-            console.log('Connection error:', error);
-            reconnectAttempts++;
-            if (reconnectAttempts >= maxReconnectAttempts) {
-                showToast('Connection failed. Using fallback mode.', 'error');
-                window.usePolling = true;
-                if (!window.pollingInterval) {
-                    window.pollingInterval = setInterval(window.pollForMessages, 5000);
-                }
-            }
-        });
-
-        // Synchronization handler
-        socket.on('sync_response', (data) => {
-            console.log('Sync response:', data);
-            
-            data.missed_messages.forEach(messageData => {
-                window.addMessageToDOM(messageData, 'sent');
-            });
-            
-            if (data.current_sequence) {
-                window.currentSequence = data.current_sequence;
-            }
-        });
-
-        // Message handlers with focus preservation
-        socket.on('new_message', (data) => {
-            // Check if message already exists
-            const existingMessage = messageContainer.querySelector(`[data-client-id="${data.client_id}"]`);
-            
-            if (!existingMessage) {
-                window.addMessageToDOM(data, 'sent');
-                
-                // PRESERVE INPUT FOCUS when receiving messages
-                const messageInput = document.querySelector('input[name="message"]');
-                if (messageInput && document.activeElement === messageInput) {
-                    // User was typing, maintain focus
-                    setTimeout(() => messageInput.focus(), 50);
-                }
-                
-                // Show notification for received messages
-                if (data.sender_id !== userId) {
-                    showToast(`New message from ${data.sender}`, 'success');
-                }
-            }
-        });
-
-        socket.on('message_confirmed', (data) => {
-            // Remove from pending and update status
-            if (window.pendingMessages.has(data.client_id)) {
-                const element = messageContainer.querySelector(`[data-client-id="${data.client_id}"]`);
-                if (element) {
-                    window.updateMessageStatus(element, 'sent', data);
-                }
-                window.pendingMessages.delete(data.client_id);
-            }
-        });
-
-        socket.on('message_failed', (data) => {
-            // Update message status to failed
-            if (data.client_id) {
-                const element = messageContainer.querySelector(`[data-client-id="${data.client_id}"]`);
+    // Cleanup pending messages older than 30 seconds
+    setInterval(() => {
+        const now = new Date();
+        for (const [clientId, messageInfo] of window.pendingMessages.entries()) {
+            if (now - messageInfo.timestamp > 30000) {
+                const element = document.querySelector(`[data-client-id="${clientId}"]`);
                 if (element) {
                     window.updateMessageStatus(element, 'failed');
-                    
-                    // Add retry functionality
-                    element.addEventListener('click', () => {
-                        retryMessage(data.client_id, element);
-                    });
                 }
-                window.pendingMessages.delete(data.client_id);
+                window.pendingMessages.delete(clientId);
             }
-            
-            showToast(data.error || 'Failed to send message', 'error');
-            if (sendBtn) {
-                sendBtn.disabled = false;
-                // MAINTAIN FOCUS on error
-                if (messageInput) messageInput.focus();
-            }
-        });
-
-        socket.on('error', (data) => {
-            showToast(data.message || 'An error occurred', 'error');
-            if (sendBtn) {
-                sendBtn.disabled = false;
-                // MAINTAIN FOCUS on error
-                if (messageInput) messageInput.focus();
-            }
-        });
-
-        socket.on('status_update', (data) => {
-            console.log('Status update:', data.message);
-            if (data.last_sequence !== undefined) {
-                window.currentSequence = Math.max(window.currentSequence, data.last_sequence);
-            }
-        });
-
-        // Retry failed message
-        function retryMessage(clientId, element) {
-            const content = element.querySelector('.message-content').textContent;
-            const newClientId = window.generateClientId();
-            
-            // Update element with new client ID
-            element.dataset.clientId = newClientId;
-            window.updateMessageStatus(element, 'sending');
-            
-            // Send with new client ID
-            socket.emit('send_message', {
-                application_id: applicationId,
-                content: content,
-                client_id: newClientId
-            });
-            
-            window.pendingMessages.set(newClientId, {
-                content: content,
-                timestamp: new Date()
-            });
         }
+    }, 10000);
 
-        // Send message with proper UX handling
-        const messageForm = document.getElementById('message-form');
-        if (messageForm) {
-            messageForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                if (!messageInput || !sendBtn) return;
-                
-                const content = messageInput.value.trim();
-                if (!content) return;
-
-                // Validate message length
-                if (content.length > 1000) {
-                    showToast('Message too long (max 1000 characters)', 'error');
-                    messageInput.focus(); // Keep focus even on error
-                    return;
-                }
-
-                // Generate client ID
-                const clientId = window.generateClientId();
-                
-                // Show optimistic UI immediately
-                const messageData = {
-                    client_id: clientId,
-                    sender: window.currentUserName || 'You',
-                    sender_id: userId,
-                    content: content,
-                    timestamp: new Date().toLocaleString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                    }),
-                    sequence_number: window.currentSequence + 1
-                };
-                
-                window.addMessageToDOM(messageData, 'sending');
-                
-                // Clear input immediately
-                messageInput.value = '';
-                const charCount = document.getElementById('charCount');
-                if (charCount) charCount.textContent = '0';
-
-                // KEEP INPUT FOCUSED
-                messageInput.focus();
-                
-                // Disable send button temporarily
-                sendBtn.disabled = true;
-                
-                if (socket && socket.connected) {
-                    // Send via Socket.IO
-                    socket.emit('send_message', {
-                        application_id: applicationId,
-                        content: content,
-                        client_id: clientId
-                    });
-                    
-                    // Track pending message
-                    window.pendingMessages.set(clientId, {
-                        content: content,
-                        timestamp: new Date()
-                    });
-                    
-                    // Re-enable button after short delay
-                    setTimeout(() => {
-                        if (sendBtn) {
-                            sendBtn.disabled = false;
-                            // ENSURE INPUT STAYS FOCUSED
-                            messageInput.focus();
-                        } 
-                    }, 500);
-                } else {
-                    // REPLACE FORM SUBMIT WITH FETCH TO PREVENT PAGE JUMP
-                    const formData = new FormData();
-                    formData.append('message', content);
-                    formData.append('form_id', document.querySelector('input[name="form_id"]').value);
-                    formData.append('client_id', clientId);
-                    
-                    fetch(window.location.href, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            // Message sent successfully via HTTP
-                            const element = messageContainer.querySelector(`[data-client-id="${clientId}"]`);
-                            if (element) {
-                                window.updateMessageStatus(element, 'sent');
-                            }
-                            showToast('Message sent', 'success');
-                        } else {
-                            throw new Error('HTTP send failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('HTTP fallback failed:', error);
-                        const element = messageContainer.querySelector(`[data-client-id="${clientId}"]`);
-                        if (element) {
-                            window.updateMessageStatus(element, 'failed');
-                        }
-                        showToast('Failed to send message', 'error');
-                    })
-                    .finally(() => {
-                        sendBtn.disabled = false;
-                        // CRITICAL: MAINTAIN FOCUS AFTER HTTP FALLBACK
-                        messageInput.focus();
-                    });
-                }
-            });
-        }
-
-        // Quick reply buttons with maintained focus
-        document.querySelectorAll('.quick-reply-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const replies = {
-                    "approved": "Your application has been approved! Please contact us to arrange pickup.",
-                    "questions": "We need more information about your home environment before proceeding.",
-                    "rejected": "We need more details about your living situation before we can approve this application."
-                };
-                
-                if (messageInput && replies[btn.dataset.reply]) {
-                    messageInput.value = replies[btn.dataset.reply];
-                    messageInput.focus(); // MAINTAIN FOCUS
-                    
-                    // Update character counter
-                    const charCount = document.getElementById('charCount');
-                    if (charCount) {
-                        charCount.textContent = messageInput.value.length;
-                    }
-                }
-            });
-        });
-
-    } catch (e) {
-        console.log("Socket.IO initialization failed:", e);
-        showToast("Using fallback messaging mode", "error");
-        updateConnectionStatus(false);
-        window.usePolling = true;
-    }
-}
-
-// Initialize socket connection
-initializeSocket();
-
-// Cleanup pending messages older than 30 seconds
-setInterval(() => {
-    const now = new Date();
-    for (const [clientId, messageInfo] of window.pendingMessages.entries()) {
-        if (now - messageInfo.timestamp > 30000) {
-            const element = document.querySelector(`[data-client-id="${clientId}"]`);
-            if (element) {
-                window.updateMessageStatus(element, 'failed');
-            }
-            window.pendingMessages.delete(clientId);
-        }
-    }
-}, 10000);
-
-// Keyboard shortcuts with better focus handling
-document.addEventListener('keydown', function(e) {
-    const messageInput = document.querySelector('input[name="message"]');
-    
-    // Ctrl/Cmd + Enter to send message
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && messageInput && messageInput.value.trim()) {
-        e.preventDefault();
-        const form = document.getElementById('message-form');
-        if (form) {
-            const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-            form.dispatchEvent(submitEvent);
-        }
-    }
-    
-    // Escape to clear input but maintain focus
-    if (e.key === 'Escape' && messageInput) {
-        messageInput.value = '';
-        const charCount = document.getElementById('charCount');
-        if (charCount) charCount.textContent = '0';
-        messageInput.focus(); // KEEP FOCUS AFTER CLEARING
-    }
-});
-
-// Prevent accidental page refresh
-window.addEventListener('beforeunload', function(e) {
-    if (window.pendingMessages && window.pendingMessages.size > 0) {
-        e.preventDefault();
-        e.returnValue = 'You have messages being sent. Are you sure you want to leave?';
-        return e.returnValue;
-    }
-});
-
-// Handle visibility changes to maintain focus
-document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
+    // Keyboard shortcuts with better focus handling
+    document.addEventListener('keydown', function(e) {
         const messageInput = document.querySelector('input[name="message"]');
-        if (messageInput) {
-            setTimeout(() => messageInput.focus(), 100);
+        
+        // Ctrl/Cmd + Enter to send message
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && messageInput && messageInput.value.trim()) {
+            e.preventDefault();
+            const form = document.getElementById('message-form');
+            if (form) {
+                const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                form.dispatchEvent(submitEvent);
+            }
         }
-    }
+        
+        // Escape to clear input but maintain focus
+        if (e.key === 'Escape' && messageInput) {
+            messageInput.value = '';
+            const charCount = document.getElementById('charCount');
+            if (charCount) charCount.textContent = '0';
+            messageInput.focus();
+        }
+    });
+
+    // Prevent accidental page refresh
+    window.addEventListener('beforeunload', function(e) {
+        if (window.pendingMessages && window.pendingMessages.size > 0) {
+            e.preventDefault();
+            e.returnValue = 'You have messages being sent. Are you sure you want to leave?';
+            return e.returnValue;
+        }
+    });
+
+    // Handle visibility changes to maintain focus
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            const messageInput = document.querySelector('input[name="message"]');
+            if (messageInput) {
+                setTimeout(() => messageInput.focus(), 100);
+            }
+        }
+    });
 });
