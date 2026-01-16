@@ -15,4 +15,5 @@ instance/database.db
 .vscode/
 
 # Uploaded files (user-generated content)
+wepsite/static/uploads
 static/uploads/
