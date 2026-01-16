@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Edit Pet{% endblock %}
+
+{% block title %}Edit {{ pet.name }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/editpet.css') }}">
@@ -9,78 +10,124 @@
 <!-- Hero Section -->
 <section class="editpet-hero">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="hero-content">
-                    <h1 class="hero-title">Edit Pet Information ✏️</h1>
-                    <p class="hero-subtitle">Update {{ pet.name }}'s details to help them find their perfect home</p>
-                </div>
-            </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Edit Pet Details</h1>
+            <p class="hero-subtitle">Update information for {{ pet.name }}</p>
         </div>
     </div>
 </section>
 
-<!-- Main Form Section -->
+<!-- Main Content Section -->
 <section class="main-section">
     <div class="container">
-        <!-- Floating decorative elements -->
-        <div class="floating-element">🐱</div>
-        <div class="floating-element">✏️</div>
-        <div class="floating-element">❤️</div>
-        
-        <div class="row justify-content-center">
-            <div class="col-12">
-                <div class="form-container">
-                    <img src="{{ url_for('static', filename='imgUsedToBuildTheWebsite/house2.png') }}" class="house-decoration" alt="Cat House">
-                    
-                    <h2 class="form-title">Update Pet Information</h2>
-                    
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="name" class="form-label">Pet Name</label>
-                            <input type="text" class="form-control" name="name" id="name" value="{{ pet.name }}" placeholder="Enter the pet's name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="age" class="form-label">Pet Age</label>
-                            <input type="text" class="form-control" name="age" id="age" value="{{ pet.age }}" placeholder="e.g., 2 years old, 6 months" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="breed" class="form-label">Pet Breed</label>
-                            <input type="text" class="form-control" name="breed" id="breed" value="{{ pet.breed }}" placeholder="e.g., Persian, Siamese, Mixed" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="description" rows="4" placeholder="Tell us about this pet's personality, habits, and what makes them special..." required>{{ pet.description }}</textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Current Image</label>
-                            <div class="current-image-container">
-                                <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" class="current-image" alt="{{ pet.name }}">
-                                <div class="image-overlay">
-                                    <span class="image-label">Current Photo</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="formFile" class="form-label">Update Image (Optional)</label>
-                            <div class="file-upload-wrapper">
-                                <input class="form-control" type="file" id="formFile" name="image" hidden accept="image/*">
-                                <button type="button" class="file-upload-btn" onclick="document.getElementById('formFile').click();">
-                                    📸 Choose New Photo
-                                </button>
-                                <p class="file-help-text">Leave empty to keep current image</p>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="submit-btn">Save Changes</button>
-                    </form>
+        <div class="form-container">
+            <!-- Decorative house icon -->
+            <img src="{{ url_for('static', filename='images/house-icon.svg') }}" 
+                 alt="House decoration" class="house-decoration" 
+                 onerror="this.style.display='none'">
+            
+            <!-- Floating decorative elements -->
+            <div class="floating-element">🐾</div>
+            <div class="floating-element">❤️</div>
+            <div class="floating-element">🏠</div>
+            
+            <h2 class="form-title">Edit {{ pet.name }}</h2>
+            
+            <form method="POST" enctype="multipart/form-data" id="edit-pet-form">
+                <!-- Pet Name -->
+                <div class="form-group">
+                    <label for="name" class="form-label">Pet Name</label>
+                    <input type="text" class="form-control" id="name" name="name" 
+                           value="{{ pet.name }}" required placeholder="Enter pet's name">
                 </div>
-            </div>
+
+                <!-- Age and Breed in Row -->
+                <div class="row" style="margin-bottom: 1.5rem;">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="age" class="form-label">Age (years)</label>
+                            <input type="number" class="form-control" id="age" name="age" 
+                                   value="{{ pet.age }}" required min="0" max="30" step="0.5" 
+                                   placeholder="e.g., 2.5">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="breed" class="form-label">Breed</label>
+                            <input type="text" class="form-control" id="breed" name="breed" 
+                                   value="{{ pet.breed }}" required placeholder="e.g., Persian, Golden Retriever">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- City Selection -->
+                <div class="form-group">
+                    <label for="city" class="form-label">City</label>
+                    <select class="form-control" id="city" name="city" required>
+                        <option value="" disabled>Select a city</option>
+                        {% for key, value in city_map.items() %}
+                            <option value="{{ key }}" {% if key == pet.city|string %}selected{% endif %}>
+                                {{ value }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" 
+                              rows="4" required placeholder="Tell us about {{ pet.name }}'s personality, habits, and special needs...">{{ pet.description }}</textarea>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="form-group">
+                    <label class="form-label">Current Image</label>
+                    {% if pet.image_filename %}
+                    <div class="current-image-container">
+                        <img src="{{ url_for('static', filename='uploads/' + pet.image_filename) }}" 
+                             alt="Current image of {{ pet.name }}" class="current-image">
+                        <div class="image-overlay">
+                            <span class="image-label">Current Photo</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info" style="background-color: var(--color-background); border-color: var(--color-border);">
+                        No image currently uploaded
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="image" class="form-label">Update Image (Optional)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" class="form-control" id="image" name="image" 
+                               accept="image/*" style="display: none;">
+                        <button type="button" class="file-upload-btn" onclick="document.getElementById('image').click()">
+                            <i class="fas fa-cloud-upload-alt"></i> Choose New Image
+                        </button>
+                        <p class="file-help-text">JPG, PNG or GIF up to 5MB. Leave empty to keep current image.</p>
+                        <small id="selected-file" class="text-muted" style="display: block; margin-top: 10px; text-align: center;"></small>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-group" style="margin-top: 2rem;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{{ url_for('views.pet_detail', pet_id=pet.id) }}" 
+                               class="submit-btn" style="background-color: var(--color-text-light) !important;">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </section>
@@ -88,29 +135,106 @@
 <!-- Tips Section -->
 <section class="tips-section">
     <div class="container">
-        <h2 class="tips-title">Tips for Updating Your Listing</h2>
+        <h3 class="tips-title">Tips for Better Pet Profiles</h3>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="tip-card">
-                    <i class="tip-icon">📸</i>
-                    <p class="tip-text">Update photos if the pet's appearance has changed significantly</p>
-                </div>
-                <div class="tip-card">
-                    <i class="tip-icon">📝</i>
-                    <p class="tip-text">Keep the description current with any new behaviors or preferences</p>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-camera tip-icon"></i>
+                        <p class="tip-text">Use clear, well-lit photos that show your pet's personality</p>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="tip-card">
-                    <i class="tip-icon">💡</i>
-                    <p class="tip-text">Mention any recent socialization progress or training achievements</p>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-heart tip-icon"></i>
+                        <p class="tip-text">Be honest about your pet's temperament and needs</p>
+                    </div>
                 </div>
+            </div>
+            <div class="col-md-4">
                 <div class="tip-card">
-                    <i class="tip-icon">🏥</i>
-                    <p class="tip-text">Update medical information if there have been recent vet visits</p>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle tip-icon"></i>
+                        <p class="tip-text">Include important details like medical needs or special care</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show selected file name
+    const fileInput = document.getElementById('image');
+    const selectedFileSpan = document.getElementById('selected-file');
+    
+    if (fileInput && selectedFileSpan) {
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                selectedFileSpan.textContent = 'Selected: ' + this.files[0].name;
+                selectedFileSpan.style.color = 'var(--color-primary)';
+            } else {
+                selectedFileSpan.textContent = '';
+            }
+        });
+    }
+
+    // Form validation
+    const form = document.getElementById('edit-pet-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Basic validation
+            const name = document.getElementById('name').value.trim();
+            const age = document.getElementById('age').value;
+            const breed = document.getElementById('breed').value.trim();
+            const city = document.getElementById('city').value;
+            const description = document.getElementById('description').value.trim();
+            
+            if (!name || !age || !breed || !city || !description) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return false;
+            }
+            
+            // File size validation (5MB limit)
+            if (fileInput.files && fileInput.files[0]) {
+                const fileSize = fileInput.files[0].size; // in bytes
+                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                
+                if (fileSize > maxSize) {
+                    e.preventDefault();
+                    alert('File size must be less than 5MB.');
+                    fileInput.value = '';
+                    selectedFileSpan.textContent = '';
+                    return false;
+                }
+                
+                // File type validation
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!allowedTypes.includes(fileInput.files[0].type)) {
+                    e.preventDefault();
+                    alert('Only JPG, PNG, and GIF files are allowed.');
+                    fileInput.value = '';
+                    selectedFileSpan.textContent = '';
+                    return false;
+                }
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                submitBtn.disabled = true;
+            }
+            
+            return true;
+        });
+    }
+});
+</script>
 {% endblock %}
