@@ -90,7 +90,7 @@
                                             <td>
                                                 {% if current_user.is_admin %}
                                                     <strong>{{ app.user.first_name }} {{ app.user.last_name }}</strong><br>
-                                                    <small>{{ app.user.email }}</small>
+                                                    <!-- <small>{{ app.user.email }}</small> -->
                                                 {% else %}
                                                     <small>Applied: {{ app.created_at.strftime('%b %d, %Y') if app.created_at else 'N/A' }}</small>
                                                 {% endif %}

@@ -427,7 +427,7 @@
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 790px) {
     .table-container {
         overflow-x: auto;
     }

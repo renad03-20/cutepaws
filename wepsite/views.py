@@ -229,29 +229,36 @@ def update_application_status(application_id, status):
         if app.pet.posted_by != current_user.id:
             abort(403)
         
-        # Update status
+        # 1. Update status
         app.status = status
-        db.session.commit()
         
-        # Send automatic message
+        # 2. Prepare the Automatic Message
+        last_msg = Message.query.filter_by(application_id=application_id).order_by(Message.sequence_number.desc()).first()
+        next_seq = (last_msg.sequence_number + 1) if last_msg else 1
+
         status_message = f"Application has been {status}"
         auto_message = Message(
             application_id=application_id,
             sender_id=current_user.id,
-            content=status_message
+            content=status_message,
+            sequence_number=next_seq,   
+            client_id=str(uuid.uuid4())  
         )
+        
         db.session.add(auto_message)
+        
+        # Save EVERYTHING in one single commit (Atomic Transaction)
         db.session.commit()
         
         flash(f"Application {status} successfully", "success")
         return redirect(url_for('views.messages', application_id=application_id))
+
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error updating application status: {str(e)}")
         flash('An error occurred while updating the application', 'error')
         return redirect(url_for('views.applications'))
 
-# --- REWRITTEN SOCKET.IO EVENTS ---
 
 @socketio.on('connect')
 def handle_connect():
