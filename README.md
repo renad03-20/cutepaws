@@ -1,89 +1,208 @@
-# 🐱 CutePaws - Cat Adoption Platform
+🐱 CutePaws — Cat Adoption Platform
 
-A full-stack Flask web application connecting cat lovers with adoptable pets in Saudi Arabia. Features real-time messaging, adoption workflow management, and automated pet availability scheduling.
+CutePaws is a full-stack Flask web application that connects cat lovers with adoptable pets in Saudi Arabia.
+It supports a complete adoption workflow, real-time messaging, admin moderation, and automated background tasks.
 
----
+✨ Features
+👤 User Features
 
-## ✨ Features
+Browse Pets — Filter adoptable cats by city.
 
-### 👤 User Features
-- **Browse Pets:** Filter available cats by city.
-- **Adoption Applications:** Submit detailed adoption questionnaires.
-- **Real-Time Chat:** Chat instantly with admins regarding applications (no page refresh needed!).
-- **User Accounts:** Secure registration and login system.
+Adoption Applications — Submit detailed questionnaires for adoption requests.
 
-### 👑 Admin Features
-- **Dashboard:** Manage pet listings (upload photos, edit details).
-- **Application Review:** View adopter's questionnaire answers directly within the chat interface.
-- **Availability Management:** Mark pets as "Adopted" (pets remain visible for 48 hours with an "Adopted" badge before auto-archiving).
-- **Messaging:** Communicate with applicants in real-time.
+Real-Time Chat — Instantly message admins without page refresh (Socket.IO).
 
-### ⚙️ Technical Highlights
-- **Backend:** Flask, Flask-SQLAlchemy, Flask-SocketIO.
-- **Frontend:** Bootstrap 5, JavaScript (Socket.IO client), Jinja2 templates.
-- **Database:** SQLite (dev) / SQLAlchemy ORM.
-- **Background Tasks:** APScheduler for automated cleanup of adopted pets.
+User Accounts — Secure user registration and authentication.
 
----
+👑 Admin Features
 
-## 🛠️ Installation & Setup
+Admin Dashboard — Create, edit, and manage pet listings (including image uploads).
+
+Application Review — View adopter questionnaires directly inside the chat interface.
+
+Adoption Status Management
+
+Mark pets as Adopted
+
+Pets remain visible for 48 hours with an “Adopted” badge
+
+Automatically archived after 48 hours
+
+Admin Messaging — Communicate with applicants in real time.
+
+⚙️ Technical Overview
+
+Backend: Flask, Flask-SQLAlchemy, Flask-SocketIO
+
+Frontend: Bootstrap 5, JavaScript, Jinja2
+
+Database: SQLite (development) with SQLAlchemy ORM
+
+Background Tasks: APScheduler (automated cleanup of adopted pets)
+
+Architecture: Application factory pattern
+
+🛠️ Installation & Setup
 
 Follow these steps to run the project locally.
 
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/yourusername/cat-adoption.git](https://github.com/yourusername/cat-adoption.git)
+1️⃣ Clone the Repository
+git clone https://github.com/yourusername/cat-adoption.git
 cd cat-adoption
 
-### 2. Create Virtual Environment
-```bash
+2️⃣ Create & Activate a Virtual Environment
 # Windows
 python -m venv venv
 venv\Scripts\activate
 
-# Mac/Linux
+# macOS / Linux
 python3 -m venv venv
 source venv/bin/activate
 
-### 3. Install Dependencies
-```bash
+3️⃣ Install Dependencies
 pip install -r requirements.txt
 
-### 4. Initialize Database
-Run the following commands to create the database tables:
-```Bash
+🐚 Flask App Configuration (Important)
+
+This project uses an application factory pattern, and the Flask app lives inside a package rather than a flat app.py file.
+
+Because of this, Flask cannot automatically detect the app unless it is explicitly specified.
+
+One-Time Setup (Recommended)
+
+On macOS / Linux, run:
+
+export FLASK_APP=cutepaws.wepsite
+
+
+After setting this once, you can safely run:
+
+flask shell
+flask db upgrade
+flask run
+
+
+💡 This step is required for database commands and the Flask shell to work correctly.
+
+🗄️ Database Initialization
+Using Flask-Migrate (Recommended)
 flask db init
 flask db migrate -m "Initial migration"
 flask db upgrade
 
-### 5. Run the Application
-```bash
+If Tables Are Missing (Quick Fix)
+
+If you encounter an error like:
+
+sqlite3.OperationalError: no such table: pet
+
+
+Run:
+
+flask shell
+
+
+Then inside the shell:
+
+from wepsite import db
+db.create_all()
+
+
+This ensures all database tables exist before background tasks run.
+
+▶️ Running the Application
 python main.py
 
+
+The app will be available at:
+
+http://127.0.0.1:5000
+
 🚀 How to Use
-🔑 Important: Creating an Admin User
-By default, new registrations are regular users. To test admin features (like adding pets):
+🔑 Creating an Admin User
 
-Register a new account on the website (e.g., admin@test.com).
+By default, all newly registered users are regular users.
 
-Open the database file instance/database.db using a tool like DB Browser for SQLite.
+To enable admin features:
 
-Find the user table.
+Register a new account (e.g. admin@test.com)
 
-Locate your user and change the is_admin column from 0 (or False) to 1 (or True).
+Open the database file:
 
-Save changes and log in again.
+instance/database.db
+
+
+using DB Browser for SQLite
+
+Open the user table
+
+Change:
+
+is_admin = 0 → 1
+
+
+Save changes and log in again
+
+You now have full admin access 🎉
+
+🔄 Background Scheduler Behavior
+
+The application includes an APScheduler job that runs:
+
+Immediately on startup
+
+Then every 6 hours
+
+Its job:
+
+Find pets marked as Adopted
+
+Automatically archive them after 48 hours
+
+⚠️ Important:
+If database tables do not exist when the app starts, the scheduler will raise errors.
+This is why database initialization is required before running the server.
 
 📂 Project Structure
 cutepaws/
 ├── migrations/          # Database migrations
-├── wepsite/             # Application package
-│   ├── static/          # CSS, JS, Images
-│   │   ├── javaScript/  # Socket.IO logic
-│   │   └── uploads/     # User uploaded pet photos
-│   ├── templates/       # HTML files
+├── wepsite/             # Main application package (intentional name)
+│   ├── static/
+│   │   ├── javaScript/  # Socket.IO client logic
+│   │   └── uploads/     # Uploaded pet images
+│   ├── templates/       # Jinja2 HTML templates
 │   ├── models.py        # Database models
-│   └── views.py         # Routes and logic
-├── instance/            # SQLite Database
-├── main.py              # Entry point
+│   └── views.py         # Routes and business logic
+├── instance/            # SQLite database
+├── main.py              # Application entry point
 └── requirements.txt     # Python dependencies
+
+⚠️ Note About the wepsite Folder Name
+
+The folder name wepsite is intentionally kept as-is.
+
+While this is a typo of website, renaming it at this stage would require:
+
+Updating all imports
+
+Updating Flask configuration
+
+Updating migrations
+
+Updating scheduler references
+
+To avoid breaking the project, the name has been preserved and documented instead.
+
+❤️ Final Notes
+
+CutePaws was built as a learning-focused full-stack project, combining:
+
+backend logic
+
+real-time communication
+
+background automation
+
+and clean project structure
+
+Contributions, suggestions, and improvements are always welcome ✨
