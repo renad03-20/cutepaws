@@ -163,6 +163,14 @@ Automatically archive them after 48 hours
 If database tables do not exist when the app starts, the scheduler will raise errors.
 This is why database initialization is required before running the server.
 
+## Screenshots
+<img width="1920" height="1080" alt="6" src="https://github.com/user-attachments/assets/7be28528-8497-4695-b0e3-0b627de18cd1" />
+<img width="1920" height="1080" alt="9" src="https://github.com/user-attachments/assets/179653d2-4666-484b-8840-04d49d4f6a3b" />
+<img width="1920" height="1080" alt="8" src="https://github.com/user-attachments/assets/82fe7249-7207-4456-b6ea-13740255f3e6" />
+<img width="1920" height="1080" alt="7" src="https://github.com/user-attachments/assets/9f93e2b2-0e18-4cc6-abde-71495ddb89df" />
+
+
+
 📂 Project Structure
 cutepaws/
 ├── migrations/          # Database migrations
